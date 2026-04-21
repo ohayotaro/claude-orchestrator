@@ -35,8 +35,70 @@ Calculate and report:
 - **Trades**: Win rate, Profit Factor, avg risk-reward ratio, max consecutive losses
 - **Recovery**: Recovery Factor, time to recovery
 
-### Step 5: Statistical Validation via Codex
-Delegate to Codex CLI for rigorous validation:
+### Step 5: Visualization
+
+Generate a multi-panel backtest chart. All panels share the same time axis for alignment.
+
+**Panel layout** (top to bottom):
+
+```
+┌─────────────────────────────────────────────────┐
+│ Panel 1: Price + Entry/Exit Markers              │
+│   - Candlestick or line chart of price           │
+│   - ▲ markers at long entry, ▼ at short entry    │
+│   - × markers at exit (color: green=profit,      │
+│     red=loss)                                    │
+│   - Shaded regions for position holding periods  │
+├─────────────────────────────────────────────────┤
+│ Panel 2: Signal Values                           │
+│   - Plot each signal/indicator used by strategy  │
+│   - Entry/exit threshold lines (dashed)          │
+│   - Examples: RSI with 30/70 bands, MACD with    │
+│     signal line, z-score with ±2 bands           │
+├─────────────────────────────────────────────────┤
+│ Panel 3: Cumulative PnL                          │
+│   - Cumulative return curve (strategy vs         │
+│     buy-and-hold benchmark)                      │
+│   - IS/OOS boundary marked (vertical dashed line)│
+├─────────────────────────────────────────────────┤
+│ Panel 4: Drawdown                                │
+│   - Underwater chart (% drawdown from peak)      │
+│   - Max drawdown period highlighted              │
+├─────────────────────────────────────────────────┤
+│ Panel 5: Trade Statistics                        │
+│   - Bar chart or histogram of individual trade   │
+│     returns (PnL per trade)                      │
+│   - Win/loss color coding                        │
+│   - Optional: holding period distribution        │
+└─────────────────────────────────────────────────┘
+```
+
+**Implementation notes:**
+- Use matplotlib (static, publication-quality) or Plotly (interactive HTML)
+- Save to `reports/{strategy}_{date}_chart.html` (Plotly) or `.png` (matplotlib)
+- Panels 1-4 must share x-axis for time alignment
+- Panel 5 can be a separate figure
+- If data exceeds 50,000 bars, downsample for rendering (full data kept in CSV)
+
+**Summary statistics table** (render below charts or as separate panel):
+
+```
+| Metric            | IS        | OOS       | Full      |
+|-------------------|-----------|-----------|-----------|
+| Total Return      | {value}%  | {value}%  | {value}%  |
+| Annual Return     | {value}%  | {value}%  | {value}%  |
+| Sharpe Ratio      | {value}   | {value}   | {value}   |
+| Sortino Ratio     | {value}   | {value}   | {value}   |
+| Max Drawdown      | {value}%  | {value}%  | {value}%  |
+| Win Rate          | {value}%  | {value}%  | {value}%  |
+| Profit Factor     | {value}   | {value}   | {value}   |
+| Total Trades      | {value}   | {value}   | {value}   |
+| Avg Trade Return  | {value}%  | {value}%  | {value}%  |
+| Max Consec. Loss  | {value}   | {value}   | {value}   |
+```
+
+### Step 6: Statistical Validation via Codex
+Delegate to Codex for rigorous validation:
 ```bash
 codex -a on-request "Validate backtest results:
 - Sharpe: {value}, Annual Return: {value}, Max DD: {value}
@@ -46,19 +108,26 @@ codex -a on-request "Validate backtest results:
 - Compare IS vs OOS performance gap"
 ```
 
-### Step 6: Generate Report
-Save to `reports/`:
-- HTML report with equity curve, drawdown chart, trade distribution
-- CSV with trade-by-trade details
-- JSON with summary metrics
+### Step 7: Generate Report
+Save to `reports/{strategy}_{date}/`:
+- `chart.html` or `chart.png` — multi-panel visualization from Step 5
+- `trades.csv` — trade-by-trade details (entry time, exit time, side, PnL, holding period)
+- `metrics.json` — summary metrics (IS, OOS, full period)
+- `equity_curve.csv` — timestamped cumulative PnL series (for downstream analysis)
 
-### Step 7: Gemini Chart Interpretation (Optional)
-If charts are generated, optionally send to Gemini:
+### Step 8: Gemini Chart Interpretation (Optional)
+Send the Step 5 visualization to Gemini for pattern recognition:
 ```bash
-gemini -p "Interpret this equity curve and drawdown chart. Identify concerning patterns." -f reports/equity_curve.png
+gemini -p "Analyze this backtest result chart:
+1. Equity curve shape — steady growth, regime-dependent, or curve-fitted?
+2. Drawdown patterns — clustered or distributed? Recovery speed?
+3. Entry/exit timing — are trades concentrated in specific periods?
+4. Signal behavior — do signal values show predictive pattern or noise?
+5. IS vs OOS boundary — does performance degrade after the boundary?
+Flag any signs of overfitting or data-specific artifacts." -f reports/{strategy}_{date}/chart.png
 ```
 
-### Step 8: Risk Threshold Check
+### Step 9: Risk Threshold Check
 Compare results against thresholds in `risk-management.md`:
 - Warn if Sharpe < 1.0
 - Warn if Max DD > 20%
