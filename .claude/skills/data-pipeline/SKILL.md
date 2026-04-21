@@ -92,7 +92,27 @@ Using the **data-engineer** subagent, design based on actual API response format
 - Define additional fields available from the API
 - Metadata schema (source, instrument, timeframe, fetch date, API version)
 
-### Step 5: Implement Fetcher
+### Step 5: Implementation
+
+**Assess scope**: Count the independent modules required.
+
+| Scope | Action |
+|-------|--------|
+| Single data source, simple pipeline | Implement directly (Steps 5a-5c below) |
+| Multiple data sources, or complex processing | **Transition to `/team-implement`** |
+
+**If transitioning to `/team-implement`**, pass the schema design from Step 4:
+```
+Module assignments:
+- data-engineer → src/data/fetcher_{source}.py (per data source)
+- data-engineer → src/data/cleaner.py (normalization, quality checks)
+- data-engineer → src/data/storage.py (Parquet write, dedup, metadata)
+Interface contracts: {schema from Step 4, shared types}
+```
+
+**If implementing directly:**
+
+#### Step 5a: Implement Fetcher
 Create data fetching module in `src/data/`:
 - API client matching the researched specification exactly
 - Rate limiter matching the documented limits (not guessed)
@@ -100,7 +120,7 @@ Create data fetching module in `src/data/`:
 - Retry logic with backoff for documented error codes
 - Request logging for debugging
 
-### Step 6: Implement Cleaner
+#### Step 5b: Implement Cleaner
 Create data cleaning module:
 - Timezone normalization to UTC (from the API's documented format)
 - Missing value detection and handling
@@ -108,7 +128,7 @@ Create data cleaning module:
 - OHLCV consistency checks (high >= max(open, close) >= low)
 - Gap detection (missing candles vs market closures)
 
-### Step 7: Storage
+#### Step 5c: Storage
 - Save to Parquet format in `data/` directory
 - Generate metadata JSON alongside each data file
 - Implement deduplication for re-fetches
