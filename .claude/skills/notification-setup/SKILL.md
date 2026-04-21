@@ -1,96 +1,146 @@
 ---
 name: notification-setup
-description: Integrate notification channels (Discord, LINE, Telegram) for trading bot alerts. Fire-and-forget pattern with structured event messages.
+description: Design the notification routing from bot log events to alert channels. Define which events trigger notifications, at what severity, in what format, and to which channel.
 agent: bot-engineer
 allowed-tools: "Bash(python *) Bash(uv *) Read Write Edit Glob Grep"
 ---
 
-# Notification System Setup
+# Notification Routing Design
 
-Configure alert channels for trading bot events.
+Design how bot log events (defined in `bot-development.md` Structured Logging Contract) are routed to notification channels.
+
+**This skill does NOT implement channel-specific API clients.** It designs the routing rules that the notification module consumes.
 
 ## Workflow
 
-### Step 1: Channel Selection
-Ask the user which channels to configure:
-1. **Discord** — Webhook URL (easiest setup)
-2. **LINE Messaging API** — Channel access token + user ID
-3. **Telegram Bot** — Bot token + chat ID
-4. Multiple channels supported simultaneously
+### Step 1: Identify Available Log Events
+Read the Structured Logging Contract from `bot-development.md`. The following event categories are available as notification sources:
 
-### Step 2: Event Definitions
-Configure which events trigger notifications:
+| Category | Events | Default Frequency |
+|----------|--------|-------------------|
+| Lifecycle | `bot_started`, `bot_stopped`, `bot_heartbeat` | heartbeat: 60s |
+| Orders | `order_created`, `order_submitted`, `order_filled`, `order_cancelled`, `order_rejected` | Per occurrence |
+| Positions | `position_opened`, `position_closed`, `position_update` | update: 30s |
+| Safety | `safety_triggered`, `reconnect`, `reconciliation` | Per occurrence |
+| Performance | `perf_snapshot` | 5 min |
 
-| Event | Severity | Example |
-|-------|----------|---------|
-| Trade entry/exit | INFO | "BUY {amount} {symbol} @ {price}" |
-| Daily PnL summary | INFO | "Daily PnL: {amount} ({percent}%)" |
-| Safety gate triggered | WARNING | "Safety gate activated: {gate_name} ({details})" |
-| Connection lost | WARNING | "Exchange WebSocket disconnected" |
-| Emergency stop | CRITICAL | "Daily loss limit reached ({amount})" |
-| Bot start/stop | INFO | "Bot started: tick_rsi v2.1" |
-| Position mismatch | CRITICAL | "Position reconciliation failed 3x" |
+### Step 2: Design Notification Rules
+Ask the user which events should trigger notifications, then define the routing table:
 
-### Step 3: Implementation Pattern
+```yaml
+# notification_rules.yaml
+rules:
+  # --- CRITICAL: Always notify immediately ---
+  - event: bot_stopped
+    condition: "reason != 'user'"       # Only unexpected stops
+    severity: CRITICAL
+    channels: [primary, backup]
+    format: "[CRITICAL] Bot stopped unexpectedly: {reason} (uptime: {uptime_s}s)"
 
-**Fire-and-forget** — notification failures MUST NOT block trading:
+  - event: safety_triggered
+    severity: CRITICAL
+    channels: [primary, backup]
+    format: "[CRITICAL] Safety gate: {gate} — {details}. Action: {action}"
+
+  - event: reconciliation
+    condition: "status == 'mismatch'"
+    severity: CRITICAL
+    channels: [primary]
+    format: "[CRITICAL] Position mismatch: local={local_size} exchange={exchange_size}"
+
+  - event: order_rejected
+    severity: WARNING
+    channels: [primary]
+    format: "[WARNING] Order rejected: {order_id} — {reason}"
+
+  # --- WARNING: Notify but not urgent ---
+  - event: reconnect
+    condition: "attempt >= 3"           # Only after repeated failures
+    severity: WARNING
+    channels: [primary]
+    format: "[WARNING] Reconnection attempt #{attempt} for {target} (backoff: {backoff_s}s)"
+
+  # --- INFO: Periodic summary, not per-event ---
+  - event: position_closed
+    severity: INFO
+    channels: [primary]
+    format: "Closed {side} {symbol}: PnL {pnl} ({pnl_pct}%) | held {holding_s}s"
+
+  - event: bot_started
+    severity: INFO
+    channels: [primary]
+    format: "Bot started: {strategy} v{version}"
+
+  # --- SUMMARY: Aggregated, not real-time ---
+  - event: perf_snapshot
+    severity: SUMMARY
+    channels: [primary]
+    throttle: "1h"                      # Max 1 notification per hour
+    format: "Hourly: PnL={daily_pnl} | Latency p99={api_latency_p99_ms}ms | Errors={api_errors_1h}"
+```
+
+### Step 3: Define Severity → Channel Mapping
+Map severities to notification channels. Channels are configured in `.env` — this step only defines the routing logic, not the channel implementation.
+
+```yaml
+channels:
+  primary:
+    description: "Main alert channel (e.g., Discord, Slack, Telegram)"
+    env_var: "NOTIFY_PRIMARY_URL"
+    
+  backup:
+    description: "Backup channel for CRITICAL events (e.g., SMS, LINE, email)"
+    env_var: "NOTIFY_BACKUP_URL"
+
+severity_routing:
+  CRITICAL: [primary, backup]    # Redundant delivery for critical events
+  WARNING:  [primary]
+  INFO:     [primary]
+  SUMMARY:  [primary]
+```
+
+### Step 4: Define Throttling and Rate Limits
+Prevent notification spam during volatile markets:
+
+| Rule | Default | Rationale |
+|------|---------|-----------|
+| Max notifications per minute | 10 | Prevent spam during rapid order activity |
+| CRITICAL events bypass throttle | yes | Safety events must always deliver |
+| SUMMARY events max frequency | 1 per hour | Aggregate, don't stream |
+| Duplicate suppression window | 60s | Same event+message within window → skip |
+| Quiet hours (optional) | none | User-configurable; CRITICAL bypasses |
+
+### Step 5: Define the Notification Interface
+The notification module implements this interface. Channel-specific clients (Discord, Telegram, etc.) are pluggable backends.
+
 ```python
-async def notify(message: str, severity: str = "INFO") -> None:
-    try:
-        async with asyncio.timeout(5):
-            await _send_to_channels(message, severity)
-    except Exception:
-        logger.warning("notification_failed", message=message)
-        # Never raise — trading continues regardless
+class NotificationRouter(Protocol):
+    async def notify(self, event: dict) -> None:
+        """Route a log event through the rules table.
+        
+        Args:
+            event: A dict matching the Structured Logging Contract schema.
+                   Must contain 'event' (str) and 'ts' (ISO8601) at minimum.
+        
+        Behavior:
+            1. Match event['event'] against rules table
+            2. Evaluate condition (if any)
+            3. Check throttle/rate limits
+            4. Format message using the rule's format template
+            5. Send to mapped channels (fire-and-forget)
+            6. Log delivery success/failure (never raise)
+        """
+        ...
 ```
 
-### Step 4: Discord Webhook
-```python
-async def send_discord(webhook_url: str, message: str) -> None:
-    # Validate URL prefix: https://discord.com/api/webhooks/
-    async with httpx.AsyncClient() as client:
-        await client.post(webhook_url, json={"content": message})
-```
+### Step 6: Output
+Save notification routing config to `src/monitoring/notification_rules.yaml` (or `.json`).
 
-### Step 5: LINE Messaging API
-```python
-async def send_line(token: str, user_id: str, message: str) -> None:
-    headers = {"Authorization": f"Bearer {token}"}
-    body = {
-        "to": user_id,
-        "messages": [{"type": "text", "text": message}]
-    }
-    async with httpx.AsyncClient() as client:
-        await client.post(
-            "https://api.line.me/v2/bot/message/push",
-            headers=headers, json=body
-        )
-```
+This file is consumed by the notification module at bot startup. Changes to routing rules do not require code changes — only config edits.
 
-### Step 6: Telegram Bot
-```python
-async def send_telegram(token: str, chat_id: str, message: str) -> None:
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    async with httpx.AsyncClient() as client:
-        await client.post(url, json={"chat_id": chat_id, "text": message})
-```
-
-### Step 7: Configuration
-Add to `.env`:
-```bash
-# Discord
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/xxx/yyy
-
-# LINE
-LINE_CHANNEL_TOKEN=xxx
-LINE_USER_ID=Uxxx
-
-# Telegram
-TELEGRAM_BOT_TOKEN=xxx:yyy
-TELEGRAM_CHAT_ID=123456
-```
-
-### Step 8: Testing
-- Send test notification to each configured channel
-- Verify fire-and-forget (simulate failure, confirm bot continues)
-- Test rate limiting (don't spam channels during volatile markets)
+### Step 7: Validate
+- [ ] Every CRITICAL log event has a routing rule
+- [ ] CRITICAL rules route to both primary and backup channels
+- [ ] Throttle rules prevent >10 notifications/minute (except CRITICAL)
+- [ ] Format strings reference only fields that exist in the Structured Logging Contract
+- [ ] fire-and-forget: notification failure does not block bot execution
