@@ -1,0 +1,46 @@
+# Multi-stage build for trading bot
+# Copy and rename to Dockerfile when ready to deploy
+
+# --- Builder stage ---
+FROM python:3.11-slim-bookworm AS builder
+
+WORKDIR /build
+
+# Install uv for fast dependency resolution
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Copy dependency files first (layer caching)
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies
+RUN uv sync --frozen --no-dev --no-install-project
+
+# Copy source code
+COPY src/ src/
+
+# --- Runtime stage ---
+FROM python:3.11-slim-bookworm AS runtime
+
+# Security: run as non-root user
+RUN groupadd -r botuser && useradd -r -g botuser -d /app -s /sbin/nologin botuser
+
+WORKDIR /app
+
+# Copy installed packages and source from builder
+COPY --from=builder /build/.venv /app/.venv
+COPY --from=builder /build/src /app/src
+
+# Environment
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Switch to non-root user
+USER botuser
+
+# Default command (override in docker-compose.yml)
+CMD ["python", "-m", "src.bot.executor"]

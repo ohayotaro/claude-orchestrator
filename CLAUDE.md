@@ -34,10 +34,12 @@ It does NOT implement directly — it delegates to the right AI agent and integr
 - Trade logic and algorithm design
 - Statistical validation of backtest results
 - MQL5 code review and optimization
+- Bot async architecture review
 - Debugging and root cause analysis
 - Risk model design and verification
 - Performance optimization
 - Architecture design decisions
+- Deployment configuration review
 
 ### Gemini CLI (Multimodal Processing)
 - Chart image pattern recognition
@@ -45,6 +47,17 @@ It does NOT implement directly — it delegates to the right AI agent and integr
 - Multi-source visual comparison analysis
 - Research paper summarization
 - Visualization result interpretation
+
+### Specialized Subagents by Domain
+| Agent | Domain |
+|-------|--------|
+| data-engineer | Market data pipelines |
+| quant-analyst | Backtesting, statistics, risk |
+| strategist | Trade logic, signals |
+| ea-developer | MQL5 Expert Advisors |
+| bot-engineer | API-based Python trading bots |
+| infra-ops | Deployment, Docker, monitoring |
+| codex-debugger | Error analysis via Codex |
 
 ## 4. Delegation Triggers
 
@@ -56,6 +69,9 @@ It does NOT implement directly — it delegates to the right AI agent and integr
 | Design decision needed | Codex CLI design review |
 | Multimodal input | Delegate to Gemini CLI |
 | Error analysis | codex-debugger subagent |
+| Bot development (ccxt, WebSocket, API) | bot-engineer subagent |
+| Deployment / Docker / infra | infra-ops subagent |
+| Bot incident / emergency | `/incident-response` skill |
 
 ## 5. Execution Patterns
 
@@ -111,6 +127,8 @@ Check before responding:
 - **Data Sources**: Binance API, bybit API, MT5/Broker API, Yahoo Finance (yfinance)
 - **Backtest Frameworks**: backtrader, vectorbt
 - **EA Platform**: MetaTrader 5 (MQL5)
+- **Bot Frameworks**: ccxt (async), python-binance, pybit
+- **Deployment**: Docker, Docker Compose, systemd
 - **Primary Language**: Python 3.11+
 - **Secondary Language**: MQL5
 
@@ -128,6 +146,13 @@ uv run python src/data/fetch.py       # Fetch market data
 uv run python src/backtesting/run.py  # Run backtest
 ```
 
+### Skill Pipelines
+```
+Backtest → EA:    /data-pipeline → /strategy-design → /backtest → /optimize → /ea-generate
+API Bot:          /data-pipeline → /strategy-design → /backtest → /optimize → /bot-develop → /bot-deploy → /bot-monitor
+Live Operations:  /live-trading, /incident-response, /risk-report
+```
+
 ### Directory Map
 ```
 src/data/          → Data fetching and management
@@ -135,10 +160,13 @@ src/strategies/    → Trading strategies
 src/backtesting/   → Backtest engine
 src/optimization/  → Parameter optimization
 src/risk/          → Risk management
+src/bot/           → API-based bot engine (executor, position tracker, WebSocket)
+src/monitoring/    → Monitoring and alerting
 src/utils/         → Utilities
 mql5/experts/      → Expert Advisors
 mql5/include/      → MQL5 shared libraries
 mql5/indicators/   → Custom indicators
+docker/            → Dockerfile, docker-compose examples
 tests/             → Test suite
 data/              → Data storage (gitignored)
 reports/           → Backtest report output

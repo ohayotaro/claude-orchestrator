@@ -9,8 +9,12 @@
       "Bash(git *)",
       "Bash(codex *)",
       "Bash(gemini *)",
+      "Bash(docker *)",
+      "Bash(docker compose *)",
+      "Bash(systemctl *)",
       "Bash(mkdir *)",
       "Bash(ls *)",
+      "Bash(curl *)",
       "Read",
       "Glob",
       "Grep"
@@ -67,6 +71,11 @@
           {
             "type": "command",
             "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-backtest-analysis.py\"",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-bot-execution.py\"",
             "timeout": 5
           },
           {

@@ -76,7 +76,20 @@ def main() -> None:
         ],
         "ea-developer": [
             "ea", "expert advisor", "mql5", "mql4", "metatrader",
-            "ontick", "ctrade", "bot",
+            "ontick", "ctrade",
+        ],
+        "bot-engineer": [
+            "bot", "ccxt", "websocket", "async", "executor",
+            "live trading", "order manager", "position tracker",
+            "python-binance", "pybit", "testnet", "sandbox",
+            "ボット", "自動売買", "ライブ",
+        ],
+        "infra-ops": [
+            "deploy", "docker", "dockerfile", "compose",
+            "systemd", "kubernetes", "k8s", "vps", "cloud",
+            "monitor", "alert", "grafana", "prometheus",
+            "health check", "log", "ci/cd", "pipeline",
+            "デプロイ", "監視", "インフラ",
         ],
     }
 

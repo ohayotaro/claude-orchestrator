@@ -1,0 +1,35 @@
+# Docker Compose for trading bot deployment
+# Copy and rename to docker-compose.yml, then configure .env
+
+services:
+  trading-bot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.example
+    container_name: trading-bot
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      - BOT_MODE=dry-run  # Change to 'testnet' or 'live' when ready
+      - LOG_LEVEL=INFO
+    ports:
+      - "8080:8080"  # Health check endpoint
+    volumes:
+      - bot-data:/app/data
+      - bot-logs:/app/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  bot-data:
+  bot-logs:
