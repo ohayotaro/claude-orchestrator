@@ -1,266 +1,287 @@
 # Financial Trading AI Orchestrator
 
-> **Reusable template** — clone and customize for any financial trading project.
+> **Reusable template** — clone, customize, and let the AI team build your trading system.
 
-Claude Code (Opus 4.6) をオーケストレーターとし、Codex CLI (GPT-5.4) と Gemini CLI (Gemini 2.5 Pro) を専門エージェントとして統合する、**汎用**金融トレーディングAIチームテンプレート。
+3つのAI（Claude, Codex, Gemini）が専門チームとして連携する、金融トレーディング開発テンプレート。暗号資産・FX・先物・株式に対応。バックテストからBot開発、デプロイ、企業分析まで、25のスキルで開発ワークフローをカバー。
 
-バックテスト解析、トレードロジック開発、EA開発、APIベースの自動売買Bot開発・デプロイ・運用監視、ML/AIモデルパイプラインに対応。取引所・通貨・戦略に依存しない設計。
+---
 
-## Architecture
+## How It Works
 
-```
-┌──────────────────────────────────────────────────────┐
-│               Claude Code (Opus 4.6)                 │
-│               ── Orchestrator ──                     │
-│    Delegates, integrates, does NOT implement         │
-├──────────────┬───────────────┬───────────────────────┤
-│  Subagents   │   Codex CLI   │     Gemini CLI        │
-│  (Opus)      │   (GPT-5.4)   │     (Gemini 2.5 Pro)  │
-│              │               │                       │
-│  - Codebase  │  - Design     │  - Chart analysis     │
-│  - Review    │  - Debug      │  - PDF extraction     │
-│  - Docs      │  - Algorithm  │  - Research           │
-│  - Tests     │  - Statistics  │  - Visualization      │
-└──────────────┴───────────────┴───────────────────────┘
-```
-
-### Routing Policy
-
-| AI | Role | Trigger |
-|----|------|---------|
-| **Claude Subagents** | Codebase exploration, lightweight review, docs, tests | 3+ files to read, documentation tasks |
-| **Codex CLI** | Algorithm design, statistical validation, MQL5 review, debugging | Design decisions, errors, complex logic |
-| **Gemini CLI** | Chart pattern recognition, PDF parsing, multimodal research | Image/PDF input, visual analysis |
-
-## Specialized Team Agents
-
-| Agent | Domain | File Scope |
-|-------|--------|------------|
-| `data-engineer` | Market data pipelines (Binance, bybit, MT5, yfinance) | `src/data/*` |
-| `quant-analyst` | Backtesting, statistics, risk management | `src/backtesting/*`, `src/risk/*` |
-| `strategist` | Trade logic design, signal generation | `src/strategies/*` |
-| `ea-developer` | MQL5 Expert Advisors | `mql5/*` |
-| `bot-engineer` | API-based Python trading bots (ccxt, WebSocket, exchange adapters) | `src/bot/*` |
-| `infra-ops` | Deployment, Docker, monitoring, dashboards, alerting | `docker/*`, `src/monitoring/*` |
-| `ml-engineer` | ML model training, feature engineering, walk-forward validation | `src/strategies/*`, ML pipelines |
-| `codex-debugger` | Error analysis via Codex CLI | Any (error routing) |
-
-## Skill Pipelines
+Claude Code がプロジェクトマネージャーとして、タスクに応じて最適なAIに作業を委譲します。
 
 ```
-Backtest → EA:     /data-pipeline → /strategy-design → /backtest → /optimize → /ea-generate
-API Bot:           /data-pipeline → /strategy-design → /backtest → /optimize → /bot-develop → /bot-deploy → /bot-monitor
-ML Pipeline:       /data-pipeline → /ml-pipeline → /backtest → /optimize → /bot-develop
-Live Operations:   /live-trading, /incident-response, /risk-report
-Equity:            /equity-screener → /earnings-calendar → /sector-analysis → /strategy-design
-Support:           /dashboard-develop, /notification-setup, /checkpointing
+┌─────────────────────────────────────────────────┐
+│            Claude Code (Opus 4.6)                │
+│            ── Orchestrator ──                    │
+│  あなたと対話し、タスクを振り分け、結果を統合    │
+├─────────────┬──────────────┬────────────────────┤
+│  Subagents  │  Codex CLI   │    Gemini CLI       │
+│  (Opus)     │  (GPT-5.4)   │    (Gemini 2.5 Pro) │
+│             │              │                    │
+│ コード探索  │ 設計・推論   │ チャート分析        │
+│ レビュー    │ デバッグ     │ PDF・レポート解析   │
+│ テスト作成  │ 統計検証     │ マルチモーダル      │
+└─────────────┴──────────────┴────────────────────┘
 ```
 
-### Available Skills (25)
+**自動ルーティング**: 9つの Hook がプロンプト内容を分析し、最適なAI・エージェントを自動的に提案します。手動でのAI選択は不要です。
 
-| Skill | Description |
-|-------|-------------|
-| `/init-finance` | Initialize project structure, dependencies, and config |
-| `/data-pipeline` | Build market data acquisition and storage pipelines |
-| `/backtest` | Execute backtests with performance metrics and Codex validation |
-| `/strategy-design` | Design new strategies with parallel Researcher/Strategist analysis |
-| `/optimize` | Walk-forward optimization with overfitting detection |
-| `/ea-generate` | Convert Python strategies to MQL5 Expert Advisors |
-| `/market-analysis` | Multi-timeframe analysis with Gemini chart recognition |
-| `/risk-report` | Portfolio risk assessment (VaR/CVaR, stress testing) |
-| `/team-implement` | Parallel implementation via Agent Teams |
-| `/team-review` | 3-reviewer parallel code review (Security, Quant, Performance) |
-| `/codex-system` | Direct Codex CLI delegation templates |
-| `/gemini-system` | Direct Gemini CLI delegation templates |
-| `/checkpointing` | Session state snapshot and recovery |
-| `/bot-develop` | Build API-based trading bots (ccxt, WebSocket, async) |
-| `/live-trading` | Manage live trading execution and staged rollout |
-| `/bot-deploy` | Deploy bots with Docker, systemd, health checks |
-| `/bot-monitor` | Set up monitoring, alerting, and dashboards |
-| `/incident-response` | Handle bot incidents, emergency stop, postmortem |
-| `/ml-pipeline` | ML model training, feature engineering, walk-forward validation |
-| `/dashboard-develop` | Build FastAPI + Vite real-time trading dashboards |
-| `/notification-setup` | Integrate Discord, LINE, Telegram alert channels |
-| `/equity-screener` | Stock screening with fundamental/technical criteria |
-| `/earnings-calendar` | Manage earnings, dividends, and corporate events |
-| `/sector-analysis` | Sector performance, rotation signals, and allocation |
-| `/ir-analysis` | Investor-focused corporate analysis from IR materials (Gemini + Codex) |
-
-## Hooks (9)
-
-Hooks enforce routing policies at the tool-call level:
-
-| Hook | Event | Purpose |
-|------|-------|---------|
-| `agent-router.py` | UserPromptSubmit | Analyze prompt and suggest optimal AI routing |
-| `check-codex-before-write.py` | PreToolUse (Edit/Write) | Flag design decisions for Codex review |
-| `suggest-gemini-research.py` | PreToolUse (WebSearch/WebFetch) | Suggest Gemini for research tasks |
-| `error-to-codex.py` | PostToolUse (Bash) | Route errors to codex-debugger |
-| `post-backtest-analysis.py` | PostToolUse (Bash) | Auto-analyze backtest results |
-| `post-implementation-review.py` | PostToolUse (Edit/Write) | Suggest Codex review after large changes |
-| `lint-on-save.py` | PostToolUse (Edit/Write) | Auto-lint Python/MQL5 files |
-| `log-cli-tools.py` | PostToolUse (Bash) | Log Codex/Gemini CLI usage |
-| `post-bot-execution.py` | PostToolUse (Bash) | Detect bot execution errors, connection failures |
-
-## Rules (11)
-
-| Rule | Scope |
-|------|-------|
-| `financial-domain.md` | Numerical precision, backtest principles, data quality |
-| `risk-management.md` | Position limits, loss limits, emergency stop requirements |
-| `security.md` | API key management, testnet-first, no hardcoded secrets |
-| `codex-delegation.md` | When and how to delegate to Codex CLI |
-| `gemini-delegation.md` | When and how to delegate to Gemini CLI |
-| `coding-principles.md` | Type hints, testing, naming conventions (Python/MQL5) |
-| `testing.md` | Test categories, pytest conventions, markers |
-| `language.md` | Japanese for users, English for code/agents |
-| `bot-development.md` | ccxt patterns, WebSocket management, asyncio, testnet-first |
-| `deployment.md` | Docker best practices, systemd, CI/CD, rollback procedures |
-| `monitoring.md` | Structured logging, metrics, alert thresholds, notifications |
-
-## Prerequisites
-
-- [Claude Code](https://claude.ai/code) (CLI)
-- [Codex CLI](https://github.com/openai/codex) (`brew install codex` or `npm i -g @openai/codex`)
-- [Gemini CLI](https://github.com/google-gemini/gemini-cli) (`npm i -g @anthropic-ai/gemini-cli`)
-- Python 3.11+
-- [uv](https://docs.astral.sh/uv/) (Python package manager)
+---
 
 ## Quick Start
 
+### 前提条件
+
+| ツール | インストール |
+|--------|-------------|
+| [Claude Code](https://claude.ai/code) | `npm i -g @anthropic-ai/claude-code` |
+| [Codex CLI](https://github.com/openai/codex) | `brew install codex` |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `npm i -g @anthropic-ai/gemini-cli` |
+| Python 3.11+ | [python.org](https://www.python.org/) |
+| [uv](https://docs.astral.sh/uv/) | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+
+### セットアップ
+
 ```bash
-# Clone
+# 1. クローン
 git clone https://github.com/ohayotaro/claude-orchestrator.git
 cd claude-orchestrator
 
-# Set up environment
+# 2. 環境変数の設定
 cp .env.example .env
-# Edit .env with your API keys (Binance, bybit, MT5, etc.)
+# .env を編集して取引所のAPIキーを設定
 
-# Install Python dependencies
+# 3. 依存関係のインストール
 uv sync
 
-# Start Claude Code in this directory
+# 4. Claude Code を起動
 claude
 
-# Initialize the project (within Claude Code)
+# 5. プロジェクトを初期化（Claude Code 内で実行）
 /init-finance
 ```
 
-## Usage Examples
+`/init-finance` が対話形式で市場・データソース・技術スタックを聞き取り、CLAUDE.md を自動設定します。
 
-```bash
-# Within Claude Code session:
+---
 
-# Build a data pipeline for BTC/USDT
-/data-pipeline
+## やりたいこと別ガイド
 
-# Design a moving average crossover strategy
-/strategy-design
+### 戦略を開発してバックテストしたい
 
-# Run a backtest with statistical validation
-/backtest
-
-# Optimize strategy parameters
-/optimize
-
-# Generate MQL5 Expert Advisor
-/ea-generate
-
-# Analyze current market conditions
-/market-analysis
-
-# Generate risk report
-/risk-report
-
-# Delegate to Codex for deep analysis
-/codex-system Review this algorithm for overfitting risk
-
-# Delegate to Gemini for chart analysis
-/gemini-system Analyze chart patterns in chart.png
-
-# --- API Bot Development ---
-
-# Build an API-based trading bot
-/bot-develop
-
-# Deploy bot with Docker
-/bot-deploy
-
-# Set up monitoring and alerts
-/bot-monitor
-
-# Go live (staged rollout)
-/live-trading
-
-# Handle bot incidents
-/incident-response
+```
+/data-pipeline          ← まずデータを取得
+/strategy-design        ← 戦略を設計（Codex が統計的エッジをレビュー）
+/backtest               ← バックテスト実行（Sharpe, DD, 勝率を自動計算）
+/optimize               ← パラメータ最適化（過学習検出付き）
 ```
 
-## Project Structure
+### 自動売買Botを開発・デプロイしたい
+
+```
+/bot-develop            ← ccxt/WebSocket ベースのBot実装
+/bot-deploy             ← Docker コンテナ化 + デプロイ
+/bot-monitor            ← 監視・アラート設定（Discord/Telegram等）
+/live-trading           ← 段階的にライブ移行（testnet → 最小ロット → 本番）
+```
+
+### MQL5 EA を作りたい
+
+```
+/ea-generate            ← Python戦略 → MQL5 EA 変換（Codex レビュー付き）
+```
+
+### 株式を分析・スクリーニングしたい
+
+```
+/equity-screener        ← PER/PBR/ROE 等で銘柄スクリーニング
+/earnings-calendar      ← 決算・配当・コーポレートアクション管理
+/sector-analysis        ← セクターローテーション分析
+/ir-analysis            ← IR資料から投資テーシス作成（Gemini で PDF 分析）
+```
+
+### MLモデルで予測したい
+
+```
+/ml-pipeline            ← 特徴量設計 → モデル訓練 → walk-forward 検証
+```
+
+### チャートや資料を分析したい
+
+```
+/market-analysis        ← マルチタイムフレーム分析（Gemini チャート認識）
+/gemini-system          ← PDF・画像を直接 Gemini に投げる
+```
+
+### 障害が起きた
+
+```
+/incident-response      ← 緊急停止 → 根本原因分析（Codex） → ポストモーテム
+```
+
+---
+
+## 専門チームエージェント（9名）
+
+| エージェント | 専門領域 | いつ呼ばれるか |
+|---|---|---|
+| `data-engineer` | データパイプライン、API統合 | データ取得・クリーニング時 |
+| `quant-analyst` | バックテスト、統計、リスク | 検証・分析時 |
+| `strategist` | 戦略設計、シグナル生成 | 戦略の新規設計・改善時 |
+| `ea-developer` | MQL5 EA 開発 | MetaTrader EA 作成時 |
+| `bot-engineer` | API Bot、WebSocket、非同期 | Bot 実装時 |
+| `infra-ops` | Docker、デプロイ、監視 | インフラ構築時 |
+| `ml-engineer` | ML訓練、特徴量、検証 | 機械学習パイプライン時 |
+| `codex-debugger` | エラー分析 | エラー発生時（自動検出） |
+| `general-purpose` | コード探索、ドキュメント | 汎用タスク |
+
+---
+
+## 全25スキル一覧
+
+<details>
+<summary>クリックして展開</summary>
+
+| カテゴリ | スキル | 説明 |
+|---------|--------|------|
+| **基盤** | `/init-finance` | プロジェクト初期化 |
+| **データ** | `/data-pipeline` | データ取得・正規化・保存 |
+| **戦略** | `/strategy-design` | 戦略設計（並列 Researcher/Strategist） |
+| | `/backtest` | バックテスト実行 + Codex 統計検証 |
+| | `/optimize` | パラメータ最適化（過学習検出付き） |
+| | `/market-analysis` | マルチタイムフレーム + Gemini チャート分析 |
+| **EA** | `/ea-generate` | Python → MQL5 EA 変換 |
+| **Bot** | `/bot-develop` | API Bot 実装（ccxt, WebSocket） |
+| | `/live-trading` | ライブ移行管理（段階的ロールアウト） |
+| | `/bot-deploy` | Docker デプロイ + ヘルスチェック |
+| | `/bot-monitor` | 監視・メトリクス・アラート |
+| | `/incident-response` | 障害対応・緊急停止・ポストモーテム |
+| **ML** | `/ml-pipeline` | ML モデル訓練・walk-forward 検証 |
+| **株式** | `/equity-screener` | ファンダメンタル/テクニカル スクリーニング |
+| | `/earnings-calendar` | 決算・配当・コーポレートアクション |
+| | `/sector-analysis` | セクターローテーション分析 |
+| | `/ir-analysis` | IR資料から投資テーシス作成 |
+| **リスク** | `/risk-report` | VaR/CVaR, ストレステスト |
+| **チーム** | `/team-implement` | Agent Teams 並列実装 |
+| | `/team-review` | 3専門レビュアー並列レビュー |
+| **ダッシュボード** | `/dashboard-develop` | FastAPI + Vite リアルタイム UI |
+| **通知** | `/notification-setup` | Discord / LINE / Telegram 統合 |
+| **AI直接** | `/codex-system` | Codex CLI 直接呼び出し |
+| | `/gemini-system` | Gemini CLI 直接呼び出し |
+| **保存** | `/checkpointing` | セッション状態スナップショット |
+
+</details>
+
+---
+
+## カスタマイズ方法
+
+このテンプレートを自分のプロジェクトに適用するには:
+
+### 1. CLAUDE.md Zone B を編集
+
+`/init-finance` が自動設定しますが、手動でも編集可能:
+
+```markdown
+@orchestra:template-boundary
+
+## Project Identity
+- **Name**: My Trading Project
+- **Markets**: Crypto
+- **Data Sources**: Binance API
+- **Execution Platforms**: ccxt
+```
+
+### 2. ルーティングキーワードをカスタマイズ
+
+`.claude/routing-keywords.json` を編集して、プロジェクト固有のキーワードを追加:
+
+```json
+{
+  "data-engineer": ["data", "fetch", "my-custom-exchange", ...],
+  "bot-engineer": ["bot", "ccxt", "my-broker-sdk", ...]
+}
+```
+
+### 3. バックテスト閾値を調整
+
+`.claude/backtest-thresholds.json` でプロジェクトに合った警告閾値を設定:
+
+```json
+{
+  "sharpe": { "threshold": 1.5, "comparison": "below", ... },
+  "max_drawdown": { "threshold": 15.0, "comparison": "above", ... }
+}
+```
+
+---
+
+## 裏側の仕組み
+
+### Hook 自動ルーティング（9つ）
+
+あなたが普通にプロンプトを入力するだけで、Hook が裏側で動きます:
+
+- **入力時**: プロンプトを分析して最適なエージェントを提案
+- **コード編集前**: 設計判断が必要な場合に Codex レビューを推奨
+- **コマンド実行後**: エラーを検出したら codex-debugger を提案
+- **バックテスト後**: パフォーマンス指標を自動チェック（閾値違反で警告）
+- **Bot実行後**: 接続エラーや注文失敗を検出してアラート
+
+### ルール（11個）
+
+エージェントが従う品質基準:
+
+- **金融ドメイン**: 数値精度、ルックアヘッドバイアス禁止、取引コスト必須
+- **リスク管理**: ストップロス必須、セーフティゲート、サーキットブレーカー
+- **セキュリティ**: APIキーは環境変数、testnet優先、出金権限禁止
+- **コード品質**: 型ヒント、テストカバレッジ80%、ruff + mypy
+
+### 3ゾーン CLAUDE.md
+
+| Zone | 内容 | 変更頻度 |
+|------|------|---------|
+| **A** | オーケストレーションルール、委譲ポリシー | 変更しない（テンプレート） |
+| **B** | プロジェクト固有設定（市場、データソース） | `/init-finance` で1回設定 |
+| **C** | 作業中のコンテキスト | セッションごとに自動更新 |
+
+---
+
+## プロジェクト構成
 
 ```
 claude-orchestrator/
-├── CLAUDE.md                    # 3-zone orchestrator contract
+├── CLAUDE.md                        # オーケストレーター契約書（3ゾーン）
 ├── .claude/
-│   ├── settings.json            # Hooks, permissions, env vars
-│   ├── agents/                  # 9 specialized subagent definitions
-│   ├── hooks/                   # 9 Python hook scripts
-│   ├── rules/                   # 11 domain rule files
-│   ├── skills/                  # 21 skill definitions (SKILL.md)
-│   └── docs/                    # DESIGN.md, CODEX_HANDOFF_PLAYBOOK.md
-├── .codex/
-│   ├── AGENTS.md                # Codex agent contract
-│   └── config.toml              # Codex CLI config (GPT-5.4)
-├── .gemini/
-│   ├── GEMINI.md                # Gemini agent contract
-│   └── settings.json            # Gemini CLI config (Gemini 2.5 Pro)
-├── src/
-│   ├── data/                    # Data fetching and management
-│   ├── strategies/              # Trading strategies
-│   ├── backtesting/             # Backtest engine
-│   ├── optimization/            # Parameter optimization
-│   ├── risk/                    # Risk management
-│   ├── bot/                     # API-based bot engine (executor, WebSocket, position tracker)
-│   ├── monitoring/              # Monitoring and alerting
-│   └── utils/                   # Utilities
-├── docker/
-│   ├── Dockerfile.example       # Multi-stage Docker build template
-│   └─��� docker-compose.example.yml  # Compose deployment template
-├── mql5/
-│   ├── experts/                 # Expert Advisors
-│   ├── include/                 # Shared MQL5 libraries
-│   └── indicators/              # Custom indicators
-├── tests/                       # Test suite
-├── data/                        # Data storage (gitignored)
-├── reports/                     # Backtest reports output
-└── pyproject.toml               # Python dependencies (uv)
+│   ├── settings.json                # Hook・権限設定
+│   ├── agents/                      # 9 専門エージェント定義
+│   ├── hooks/                       # 9 Python Hook スクリプト
+│   ├── rules/                       # 11 ドメインルール
+│   ├── skills/                      # 25 スキル定義
+│   ├── routing-keywords.json        # ルーティングキーワード（カスタマイズ可）
+│   ├── backtest-thresholds.json     # バックテスト閾値（カスタマイズ可）
+│   └── docs/                        # 設計書、Codex 委譲テンプレート
+├── .codex/                          # Codex CLI 設定
+├── .gemini/                         # Gemini CLI 設定
+├── src/                             # Python ソースコード
+│   ├── data/                        #   データ取得・管理
+│   ├── strategies/                  #   トレード戦略
+│   ├── backtesting/                 #   バックテストエンジン
+│   ├── optimization/                #   パラメータ最適化
+│   ├── risk/                        #   リスク管理
+│   ├── bot/                         #   API Bot エンジン
+│   ├── monitoring/                  #   監視・アラート
+│   └── utils/                       #   ユーティリティ
+├── mql5/                            # MQL5 Expert Advisors
+├── docker/                          # Docker デプロイテンプレート
+├── tests/                           # テストスイート
+├── data/                            # データ保存（gitignore）
+├── reports/                         # レポート出力
+└── pyproject.toml                   # Python 依存関係
 ```
 
-## CLAUDE.md — 3-Zone Architecture
-
-| Zone | Content | Mutability |
-|------|---------|------------|
-| **Zone A** | Orchestration rules, routing policy, delegation triggers | Immutable template |
-| **Zone B** | Project identity, tech stack, key commands | Set by `/init-finance` |
-| **Zone C** | Active work context, current decisions | Dynamic (updated per session) |
-
-## Tech Stack
-
-| Component | Technology |
-|-----------|-----------|
-| Analysis & Backtesting | Python 3.11+, backtrader, vectorbt, pandas, numpy |
-| EA Development | MQL5 (MetaTrader 5) |
-| Bot Development | ccxt (async), python-binance, pybit, WebSocket |
-| Deployment | Docker, Docker Compose, systemd |
-| Data Sources | Binance API, bybit API, MT5 API, yfinance |
-| Orchestrator | Claude Code (Opus 4.6, 1M context) |
-| Deep Reasoning | Codex CLI (GPT-5.4) |
-| Multimodal | Gemini CLI (Gemini 2.5 Pro) |
-| Package Manager | uv |
-| Linter | ruff |
-| Type Checker | mypy |
-| Testing | pytest |
+---
 
 ## References
 
