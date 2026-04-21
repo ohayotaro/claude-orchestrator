@@ -190,11 +190,17 @@ claude
 /init-finance               # 対話形式で Zone B をプロジェクトに合わせて設定
 ```
 
-コピーされるもの: `.claude/` (agents, hooks, rules, skills, settings), `.codex/`, `.gemini/`, `CLAUDE.md`
+**コピーされるもの（オーケストレーション設定のみ）:**
+- `.claude/` — agents, hooks, rules, skills, settings, routing-keywords, backtest-thresholds
+- `.codex/` — Codex CLI 契約書・設定
+- `.gemini/` — Gemini CLI 契約書・設定
+- `CLAUDE.md` — 3-Zone オーケストレーター契約書
 
-コピーされるもの: `.claude/` (agents, hooks, rules, skills, settings), `.codex/`, `.gemini/`, `CLAUDE.md`
-
-コピーされないもの: `src/`, `mql5/`, `docker/`, `tests/`, `pyproject.toml` — これらは `/init-finance` がプロジェクトに合わせて生成する。
+**コピーされないもの（プロジェクト固有 / スキャフォールド）:**
+- `README.md`, `LICENSE` — テンプレートのドキュメント
+- `pyproject.toml`, `uv.lock` — テンプレートの依存定義
+- `.env.example`, `.gitignore` — テンプレートの設定例
+- `src/`, `mql5/`, `docker/`, `tests/`, `data/`, `reports/` — スキャフォールド（`/init-finance` がプロジェクトに合わせて生成）
 
 ### 9.2 最新版に更新
 
@@ -224,9 +230,11 @@ mv .backtest-thresholds-backup.json .claude/backtest-thresholds.json 2>/dev/null
 # 完了後: rm .zone-b-backup.md
 ```
 
-更新されるもの: agents, hooks, rules, skills, Codex/Gemini 契約書, Zone A（テンプレートルール）
+**更新されるもの**: `.claude/` (agents, hooks, rules, skills, settings), `.codex/`, `.gemini/`, `CLAUDE.md` Zone A — オーケストレーション設定のみ
 
-保護されるもの: `routing-keywords.json`, `backtest-thresholds.json`（バックアップ→復元）, Zone B（手動復元）, `src/`, プロジェクトコード全体
+**バックアップ→復元**: `routing-keywords.json`, `backtest-thresholds.json`, Zone B
+
+**一切触れないもの**: `README.md`, `pyproject.toml`, `src/`, `tests/`, プロジェクトコード全体
 
 ### 9.3 新規プロジェクトとして開始
 
