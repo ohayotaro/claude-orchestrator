@@ -192,9 +192,43 @@ claude
 
 コピーされるもの: `.claude/` (agents, hooks, rules, skills, settings), `.codex/`, `.gemini/`, `CLAUDE.md`
 
+コピーされるもの: `.claude/` (agents, hooks, rules, skills, settings), `.codex/`, `.gemini/`, `CLAUDE.md`
+
 コピーされないもの: `src/`, `mql5/`, `docker/`, `tests/`, `pyproject.toml` — これらは `/init-finance` がプロジェクトに合わせて生成する。
 
-### 9.2 新規プロジェクトとして開始
+### 9.2 最新版に更新
+
+導入済みプロジェクトのオーケストレーター設定を最新版に更新する。Zone B（プロジェクト固有設定）は上書きされるため、事前にバックアップすること。
+
+```bash
+cd /path/to/your-project
+
+# 1. Zone B をバックアップ（プロジェクト固有設定を保護）
+sed -n '/@orchestra:template-boundary/,/@orchestra:repo-boundary/p' CLAUDE.md > .zone-b-backup.md
+
+# 2. カスタマイズ済み設定をバックアップ
+cp .claude/routing-keywords.json .routing-keywords-backup.json 2>/dev/null
+cp .claude/backtest-thresholds.json .backtest-thresholds-backup.json 2>/dev/null
+
+# 3. 最新テンプレートで上書き
+git clone --depth 1 https://github.com/ohayotaro/claude-orchestrator.git .orchestra-tmp \
+  && cp -r .orchestra-tmp/.claude .orchestra-tmp/.codex .orchestra-tmp/.gemini .orchestra-tmp/CLAUDE.md . \
+  && rm -rf .orchestra-tmp
+
+# 4. バックアップを復元
+mv .routing-keywords-backup.json .claude/routing-keywords.json 2>/dev/null
+mv .backtest-thresholds-backup.json .claude/backtest-thresholds.json 2>/dev/null
+
+# 5. Zone B を復元（手動: バックアップ内容を CLAUDE.md に再挿入）
+# .zone-b-backup.md の内容を CLAUDE.md の @orchestra:template-boundary 以下に貼り付け
+# 完了後: rm .zone-b-backup.md
+```
+
+更新されるもの: agents, hooks, rules, skills, Codex/Gemini 契約書, Zone A（テンプレートルール）
+
+保護されるもの: `routing-keywords.json`, `backtest-thresholds.json`（バックアップ→復元）, Zone B（手動復元）, `src/`, プロジェクトコード全体
+
+### 9.3 新規プロジェクトとして開始
 
 スキャフォールド込みで新規プロジェクトを作成する:
 
