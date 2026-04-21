@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+"""PostToolUse hook (Bash): Log codex and gemini CLI command usage to
+.claude/logs/cli-tools.jsonl for session tracking and analytics.
+"""
+
+import json
+import os
+import sys
+from datetime import datetime, timezone
+
+LOG_FILE = os.path.join(
+    os.environ.get("CLAUDE_PROJECT_DIR", "."),
+    ".claude", "logs", "cli-tools.jsonl",
+)
+
+TRACKED_COMMANDS = ["codex", "gemini"]
+
+
+def main() -> None:
+    raw = sys.stdin.read()
+    if not raw.strip():
+        sys.exit(0)
+
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        sys.exit(0)
+
+    tool_input = data.get("tool_input", {})
+    command = tool_input.get("command", "")
+
+    # Only log tracked CLI tool usage
+    if not any(command.startswith(cmd) or f" {cmd} " in command for cmd in TRACKED_COMMANDS):
+        sys.exit(0)
+
+    tool_output = data.get("tool_output", {})
+    stdout = tool_output.get("stdout", "")
+    exit_code = tool_output.get("exit_code", None)
+
+    # Determine which tool was used
+    tool_name = "unknown"
+    for cmd in TRACKED_COMMANDS:
+        if cmd in command:
+            tool_name = cmd
+            break
+
+    log_entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "tool": tool_name,
+        "command": command[:500],  # Truncate long commands
+        "exit_code": exit_code,
+        "output_length": len(stdout),
+        "session_id": data.get("session_id", ""),
+    }
+
+    try:
+        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+        with open(LOG_FILE, "a") as f:
+            f.write(json.dumps(log_entry) + "\n")
+    except OSError:
+        pass  # Don't fail the hook on logging errors
+
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

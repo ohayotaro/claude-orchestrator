@@ -1,0 +1,48 @@
+# Data
+data/
+!data/.gitkeep
+
+# Reports (generated)
+reports/*.html
+reports/*.pdf
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# uv
+.venv/
+
+# Claude Code logs
+.claude/logs/
+.claude/checkpoints/
+.claude/settings.local.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# MQL5 compiled
+mql5/**/*.ex5
+mql5/**/*.ex4
