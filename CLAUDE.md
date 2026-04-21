@@ -147,7 +147,7 @@ uv run mypy src/                      # Type check
 ```
 Backtest → EA:    /data-pipeline → /strategy-design → /backtest → /optimize → /ea-generate
 API Bot:          /data-pipeline → /strategy-design → /backtest → /optimize → /bot-develop → /bot-deploy → /bot-monitor
-Live Operations:  /live-trading, /incident-response, /risk-report
+Operations:       /incident-response, /risk-report
 ```
 
 ### Directory Map
