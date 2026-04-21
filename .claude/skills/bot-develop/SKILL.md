@@ -105,20 +105,11 @@ All events output as JSONL to stdout + `logs/bot.jsonl`. This is the contract th
 - Paper trading: simulate fills with real market data
 - Same code path as live — only the exchange client is mocked
 
-### Step 8: Codex Review
-Delegate to Codex for async pattern and error handling review:
-```bash
-codex -a on-request "Review this trading bot for:
-1. asyncio correctness (no blocking calls, proper cancellation)
-2. Error handling (API errors, network failures, partial fills)
-3. State consistency (position tracking accuracy)
-4. Race conditions (concurrent order/fill events)
-5. Graceful shutdown (pending orders, open positions)"
-```
-
-### Step 9: Testnet Verification
+### Step 8: Testnet Verification
 1. Run on exchange testnet/sandbox
 2. Place and cancel orders
 3. Verify position tracking accuracy
 4. Test reconnection (kill WebSocket, verify recovery)
 5. Test emergency stop procedure
+
+For full code quality review (async correctness, error handling, race conditions), run `/team-review`.

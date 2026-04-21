@@ -61,27 +61,14 @@ Generate systemd unit file for:
 - Log to journald
 - Environment file integration
 
-### Step 7: Codex Deployment Review
-```bash
-codex -a on-request "Review this deployment configuration:
-{Dockerfile + docker-compose.yml + systemd unit}
-
-Check:
-1. Security (non-root, no secrets in image, proper permissions)
-2. Reliability (restart policy, health checks, graceful shutdown)
-3. Logging (structured output, rotation, retention)
-4. Resource limits (memory, CPU constraints)
-5. Network security (exposed ports, firewall rules)"
-```
-
-### Step 8: Deploy
+### Step 7: Deploy
 1. Build image: `docker compose build`
 2. Start in detached mode: `docker compose up -d`
 3. Verify health: `curl localhost:8080/health`
 4. Check logs: `docker compose logs -f`
 5. Run deployment checklist
 
-### Step 9: Post-Deploy Verification
+### Step 8: Post-Deploy Verification
 - Health check passing
 - Exchange connected
 - Orders executing (testnet first)

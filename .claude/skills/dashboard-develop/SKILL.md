@@ -104,19 +104,7 @@ Implement using the selected stack. Apply these principles regardless of technol
 - **Error handling**: Dashboard must not crash on missing data — show "no data" state gracefully
 - **Responsive**: Layout should work on both desktop and mobile browsers
 
-### Step 6: Codex Review (for complex dashboards)
-```bash
-codex -a on-request "Review this dashboard implementation:
-{code}
-
-Check:
-1. Data/view separation (no business logic in templates)
-2. Error handling (missing data, API failures, stale data)
-3. Security (no secrets exposed in frontend, CORS configured correctly)
-4. Performance (pagination for large datasets, lazy loading)"
-```
-
-### Step 7: Deployment
+### Step 6: Deployment
 
 | Method | When to use |
 |--------|------------|

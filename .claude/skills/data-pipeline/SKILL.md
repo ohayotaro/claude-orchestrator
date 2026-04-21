@@ -134,21 +134,7 @@ Create data cleaning module:
 - Implement deduplication for re-fetches
 - Store raw API responses for debugging (optional, configurable)
 
-### Step 8: Codex Review
-Delegate to Codex for implementation review:
-```bash
-codex -a on-request "Review this data pipeline implementation:
-{code}
-
-Verify against API spec:
-1. Does the rate limiter match documented limits?
-2. Does pagination handle all edge cases (empty pages, end-of-data)?
-3. Is the timestamp conversion correct for the API's format?
-4. Are all documented error codes handled?
-5. Is the data schema mapping complete and correct?"
-```
-
-### Step 9: Validation
+### Step 8: Validation
 - Run data quality checks
 - Verify row counts match expected candle count (trading days/hours * candles per period)
 - Compare sample data against exchange UI or alternative source

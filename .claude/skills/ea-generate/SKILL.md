@@ -42,20 +42,13 @@ For single-file EAs, generate MQL5 code in `mql5/experts/`:
 - Daily loss limit check
 - Emergency stop mechanism
 
-### Step 5: Codex Code Review
-```bash
-codex -a on-request "Review this MQL5 Expert Advisor:
-{ea_code}
+### Step 5: Parity Verification
+Verify that the generated MQL5 logic matches the source Python strategy:
+- Compare signal generation conditions side by side
+- Verify parameter mapping (Python defaults ↔ MQL5 input parameters)
+- Check risk controls are equivalent (SL/TP, lot sizing, emergency stop)
 
-Check:
-1. Order management correctness (CTrade, error handling)
-2. Memory leak prevention (indicator handles, arrays)
-3. GetLastError() usage after every trade operation
-4. Slippage and spread handling
-5. Magic number management
-6. Risk controls completeness (SL/TP, lot sizing, emergency stop)
-7. Parity with original Python strategy logic"
-```
+For full code quality review (security, performance, correctness), run `/team-review`.
 
 ### Step 6: Test Configuration
 Generate MetaTrader Strategy Tester config:
