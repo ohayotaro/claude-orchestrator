@@ -111,7 +111,7 @@ Operations:    /incident-response, /risk-report
 | 16 | `/ir-analysis` | 株式 | IR 資料から投資テーシス作成（財務分析 + 定性分析） | Codex, Gemini |
 | 17 | `/risk-report` | リスク | VaR/CVaR、ストレステスト、相関分析 | quant-analyst, Codex |
 | 18 | `/team-implement` | チーム | Agent Teams による並列実装（ファイルスコープ分離） | 全エージェント |
-| 19 | `/team-review` | チーム | 3 並列レビュー（Security / Quant / Performance） | Codex |
+| 19 | `/team-review` | チーム | 4 並列レビュー（Security / Quant / Live Reproducibility / Performance） | Codex |
 | 20 | `/dashboard-develop` | インフラ | ユースケース別ダッシュボード（Bot監視/バックテスト/ポートフォリオ/リサーチ） | ユースケースによる |
 | 21 | `/notification-setup` | インフラ | ログイベント → 通知チャネル ルーティング設計 | bot-engineer |
 | 22 | `/codex-system` | AI直接 | Codex CLI 直接呼び出しテンプレート | Codex |

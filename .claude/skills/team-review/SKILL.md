@@ -1,6 +1,6 @@
 ---
 name: team-review
-description: Parallel code review with 3 specialist reviewers (Security, Quant, Performance) and Codex final judgment.
+description: Parallel code review with 4 specialist reviewers (Security, Quant, Live Reproducibility, Performance) and Codex final judgment.
 allowed-tools: "Bash(python *) Bash(codex *) Bash(git *) Read Glob Grep"
 ---
 
@@ -30,6 +30,14 @@ Comprehensive parallel code review by specialized reviewers.
 - Edge cases (zero division, empty data, NaN handling)
 - Risk management completeness
 
+**Live Reproducibility Reviewer** (bot-engineer):
+- Backtest/live parity: will the same signal logic produce the same decisions in both environments?
+- Non-determinism handling: network latency, partial fills, slippage, rate limit waits — are these accounted for or assumed away?
+- Timestamp consistency: are all time comparisons using the same source (exchange time vs local time vs UTC)?
+- State recovery: if the bot crashes mid-trade, does it restore correctly from persisted state?
+- Data source divergence: does the bot use the same data feed as the backtest, or a different one (WebSocket vs REST, real-time vs delayed)?
+- Logging contract compliance: are all mandatory events from `bot-development.md` Structured Logging Contract emitted?
+
 **Performance Reviewer** (general-purpose):
 - Execution efficiency (vectorization, unnecessary loops)
 - Memory usage (large DataFrame operations)
@@ -49,6 +57,7 @@ codex -a on-request "Final code review judgment:
 Changes: {file_list}
 Security findings: {security_issues}
 Quant findings: {quant_issues}
+Live reproducibility findings: {repro_issues}
 Performance findings: {perf_issues}
 
 Provide: overall assessment, prioritized fix list, risk level (Low/Medium/High)"
