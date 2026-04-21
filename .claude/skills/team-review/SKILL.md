@@ -30,13 +30,15 @@ Comprehensive parallel code review by specialized reviewers.
 - Edge cases (zero division, empty data, NaN handling)
 - Risk management completeness
 
-**Live Reproducibility Reviewer** (bot-engineer):
-- Backtest/live parity: will the same signal logic produce the same decisions in both environments?
+**Live Reproducibility Reviewer** (quant-analyst or bot-engineer, depending on scope):
+Applies to strategy code, backtest engine, data pipeline, AND bot code — not just bots.
+- Backtest/live parity: will the same signal logic produce the same decisions with live data? (incomplete bars, delayed data, warm-up period)
+- Execution assumptions: does the backtest assume instant fills, zero slippage, or unlimited liquidity that won't hold live?
 - Non-determinism handling: network latency, partial fills, slippage, rate limit waits — are these accounted for or assumed away?
 - Timestamp consistency: are all time comparisons using the same source (exchange time vs local time vs UTC)?
-- State recovery: if the bot crashes mid-trade, does it restore correctly from persisted state?
-- Data source divergence: does the bot use the same data feed as the backtest, or a different one (WebSocket vs REST, real-time vs delayed)?
-- Logging contract compliance: are all mandatory events from `bot-development.md` Structured Logging Contract emitted?
+- Data source divergence: does the live system use the same data format and source as the backtest? (historical API vs WebSocket, adjusted vs raw prices)
+- State recovery (bot code): if the process crashes mid-trade, does it restore correctly from persisted state?
+- Logging contract compliance (bot code): are all mandatory events from `bot-development.md` Structured Logging Contract emitted?
 
 **Performance Reviewer** (general-purpose):
 - Execution efficiency (vectorization, unnecessary loops)
