@@ -176,12 +176,35 @@ Operations:    /live-trading, /incident-response, /risk-report
 
 ## 9. Setup
 
+### 9.1 既存プロジェクトに導入（推奨）
+
+既存のプロジェクトディレクトリにオーケストレーター設定を注入する:
+
 ```bash
-git clone https://github.com/ohayotaro/claude-orchestrator.git
-cd claude-orchestrator
+cd /path/to/your-project
+git clone --depth 1 https://github.com/ohayotaro/claude-orchestrator.git .orchestra-tmp \
+  && cp -r .orchestra-tmp/.claude .orchestra-tmp/.codex .orchestra-tmp/.gemini .orchestra-tmp/CLAUDE.md . \
+  && rm -rf .orchestra-tmp
+claude
+# Claude Code 内で:
+/init-finance               # 対話形式で Zone B をプロジェクトに合わせて設定
+```
+
+コピーされるもの: `.claude/` (agents, hooks, rules, skills, settings), `.codex/`, `.gemini/`, `CLAUDE.md`
+
+コピーされないもの: `src/`, `mql5/`, `docker/`, `tests/`, `pyproject.toml` — これらは `/init-finance` がプロジェクトに合わせて生成する。
+
+### 9.2 新規プロジェクトとして開始
+
+スキャフォールド込みで新規プロジェクトを作成する:
+
+```bash
+git clone https://github.com/ohayotaro/claude-orchestrator.git my-trading-project
+cd my-trading-project
+rm -rf .git && git init     # テンプレートの git 履歴を削除
 cp .env.example .env        # API キーを設定
 uv sync                     # 依存関係インストール
-claude                      # Claude Code 起動
+claude
 # Claude Code 内で:
 /init-finance               # 対話形式でプロジェクト初期化
 ```
