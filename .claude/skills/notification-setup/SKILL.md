@@ -133,12 +133,60 @@ class NotificationRouter(Protocol):
         ...
 ```
 
-### Step 6: Output
+### Step 6: Channel Backend Implementation
+
+Each channel backend implements the `ChannelSender` protocol. The routing layer calls these — they should not contain routing logic.
+
+```python
+class ChannelSender(Protocol):
+    async def send(self, message: str, severity: str) -> None: ...
+```
+
+**Common patterns across all channel types:**
+
+| Concern | Implementation |
+|---------|---------------|
+| Transport | async HTTP client (httpx recommended) |
+| Timeout | 5 seconds max — abort silently on timeout |
+| Authentication | Load credentials from environment variables |
+| Failure handling | Log warning, never raise. Bot must not stop on notification failure |
+| URL/credential validation | Validate on startup, not per-send. Fail fast if misconfigured |
+| Rate limiting (sender side) | Respect service-specific rate limits (varies by provider) |
+
+**Webhook-based channels** (Discord, Slack, custom):
+- HTTP POST with JSON body to a configured URL
+- Severity can map to message formatting (color, prefix, mention)
+- Research the actual webhook API spec before implementing (`coding-principles.md` rule applies)
+
+**Token-based channels** (Telegram Bot, LINE Messaging API):
+- HTTP POST with Bearer token authentication
+- Requires recipient ID (chat_id, user_id) in addition to credentials
+- Research the actual push message API spec before implementing
+
+**Email-based channels** (SMTP, SES):
+- CRITICAL-only delivery recommended (email is slow)
+- Async SMTP or cloud API (SES, SendGrid)
+
+**Custom channels**:
+- Any service accepting HTTP POST can be a channel backend
+- Implement the `ChannelSender` protocol with the service's API
+
+**Registration** (in notification module):
+```python
+# Channels are registered at startup based on available env vars
+channels: dict[str, ChannelSender] = {}
+if os.environ.get("NOTIFY_PRIMARY_URL"):
+    channels["primary"] = WebhookSender(os.environ["NOTIFY_PRIMARY_URL"])
+if os.environ.get("NOTIFY_BACKUP_URL"):
+    channels["backup"] = WebhookSender(os.environ["NOTIFY_BACKUP_URL"])
+```
+
+### Step 7: Output
 Save notification routing config to `src/monitoring/notification_rules.yaml` (or `.json`).
 
 This file is consumed by the notification module at bot startup. Changes to routing rules do not require code changes — only config edits.
 
-### Step 7: Validate
+### Step 8: Validate
 - [ ] Every CRITICAL log event has a routing rule
 - [ ] CRITICAL rules route to both primary and backup channels
 - [ ] Throttle rules prevent >10 notifications/minute (except CRITICAL)
