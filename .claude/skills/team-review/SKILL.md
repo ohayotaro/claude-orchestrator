@@ -26,9 +26,18 @@ Comprehensive parallel code review by specialized reviewers.
 **Quant Reviewer** (quant-analyst):
 - Calculation precision (floating-point issues)
 - Statistical correctness (formula validation)
-- Look-ahead bias detection
+- **Look-ahead bias detection** (see checklist below)
 - Edge cases (zero division, empty data, NaN handling)
 - Risk management completeness
+
+**Look-ahead bias checklist** (Quant Reviewer must verify each):
+1. **Signal shift**: Are trading signals shifted by at least 1 bar before use? (`signal.shift(1)` or equivalent). Entry at bar N must use only data from bar N-1 and earlier.
+2. **Non-causal indicators**: Are any indicators computed with future data? (centered moving averages, forward-looking smoothing, bilateral filters). These are valid only as oracle/ground-truth labels, never as live signals.
+3. **Train/test leakage**: For ML models, is there a purge gap >= prediction horizon between training and test data? Is an embargo period applied after the purge?
+4. **Label leakage**: Are ground-truth / oracle labels (RAPR, trend scanning, centered MA) used only for training, never accessible during test/live inference?
+5. **Label mapping from train only**: If labels are remapped (e.g., HMM state → BULL/BEAR), is the mapping built exclusively from training data and then applied to test data?
+6. **Feature computation scope**: Are features computed only from past data at each point? Check for `rolling()` with `center=True`, or any operation that implicitly uses future rows.
+7. **Data alignment**: When merging multiple timeframes, is the lower-timeframe data aligned to the higher-timeframe bar's **close time** (not open time), preventing access to incomplete bars?
 
 **Live Reproducibility Reviewer** (quant-analyst or bot-engineer, depending on scope):
 Applies to strategy code, backtest engine, data pipeline, AND bot code — not just bots.
