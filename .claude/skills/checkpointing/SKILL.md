@@ -22,8 +22,39 @@ git diff --stat
 - List recently modified files
 - Check for uncommitted changes
 
-### Step 3: Save Checkpoint
-Write checkpoint file to `.claude/checkpoints/{timestamp}.md`:
+### Step 3: Update or Create Checkpoint
+
+Determine whether to update the latest checkpoint or create a new one.
+
+**Find the latest checkpoint:**
+```bash
+ls -t .claude/checkpoints/*.md 2>/dev/null | head -1
+```
+
+**Decision logic:**
+| Condition | Action | Rationale |
+|-----------|--------|-----------|
+| No previous checkpoint exists | **Create new** | First checkpoint |
+| Same git branch AND <5 new commits since last checkpoint | **Update existing** | Same work stream, incremental progress |
+| Different git branch | **Create new** | Different work context |
+| >=5 new commits since last checkpoint | **Create new** | Enough progress to warrant a separate snapshot |
+| Last checkpoint's "Active Work" task changed | **Create new** | Switched to a different task |
+
+**To check commits since last checkpoint:**
+```bash
+# Extract last checkpoint's commit hash
+LAST_HASH=$(grep -m1 'Last commit:' .claude/checkpoints/latest.md | awk '{print $NF}')
+# Count new commits
+git rev-list --count ${LAST_HASH}..HEAD
+```
+
+**When updating**: Overwrite the existing file's content but keep the same filename. Update the timestamp inside the document.
+
+**When creating new**: Write to `.claude/checkpoints/{YYYY-MM-DD}_{HH-MM}_{branch}.md`.
+
+**Always**: Maintain a symlink or copy at `.claude/checkpoints/latest.md` pointing to the most recent checkpoint.
+
+Checkpoint content:
 
 ```markdown
 # Checkpoint: {timestamp}
@@ -67,7 +98,8 @@ Create a git commit to preserve the checkpoint state. This is separate from feat
 
 ```bash
 git add CLAUDE.md .claude/checkpoints/ .claude/docs/ reports/
-git commit -m "chore(checkpoint): session snapshot {timestamp}
+# Use "update" or "create" based on Step 3 decision:
+git commit -m "chore(checkpoint): {update|create} {checkpoint_filename}
 
 Checkpoint includes:
 - Zone C context update
