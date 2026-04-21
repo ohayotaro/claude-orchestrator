@@ -31,13 +31,13 @@ Comprehensive parallel code review by specialized reviewers.
 - Risk management completeness
 
 **Look-ahead bias checklist** (Quant Reviewer must verify each):
-1. **Signal shift**: Are trading signals shifted by at least 1 bar before use? (`signal.shift(1)` or equivalent). Entry at bar N must use only data from bar N-1 and earlier.
-2. **Non-causal indicators**: Are any indicators computed with future data? (centered moving averages, forward-looking smoothing, bilateral filters). These are valid only as oracle/ground-truth labels, never as live signals.
-3. **Train/test leakage**: For ML models, is there a purge gap >= prediction horizon between training and test data? Is an embargo period applied after the purge?
-4. **Label leakage**: Are ground-truth / oracle labels (RAPR, trend scanning, centered MA) used only for training, never accessible during test/live inference?
-5. **Label mapping from train only**: If labels are remapped (e.g., HMM state → BULL/BEAR), is the mapping built exclusively from training data and then applied to test data?
-6. **Feature computation scope**: Are features computed only from past data at each point? Check for `rolling()` with `center=True`, or any operation that implicitly uses future rows.
-7. **Data alignment**: When merging multiple timeframes, is the lower-timeframe data aligned to the higher-timeframe bar's **close time** (not open time), preventing access to incomplete bars?
+1. **Signal causality**: At decision time T, does the signal use only data available at or before T? Any computation that requires data after T is look-ahead.
+2. **Indicator causality**: Are all indicators strictly causal? Indicators that use future data (e.g., centered windows, forward smoothing) must be flagged — they are valid only as oracle labels for training, never as live signals.
+3. **Train/test separation**: Is there a sufficient gap between training and test periods to prevent information leakage? For ML models, this means purge and embargo buffers.
+4. **Label isolation**: Are ground-truth or oracle labels (which intentionally use future data) inaccessible during test and live inference?
+5. **Derived mapping isolation**: If model outputs are remapped to trading signals (e.g., cluster ID → regime label), is the mapping built exclusively from training data?
+6. **Feature scope**: Does every feature computation at time T use only rows at or before T? Watch for operations that implicitly include future rows (centered windows, bilateral operations, full-dataset normalization).
+7. **Multi-resolution alignment**: When combining data from different timeframes or sources, is each data point aligned to its availability time (not its label time)? Incomplete higher-timeframe bars must not be accessible to lower-timeframe logic.
 
 **Live Reproducibility Reviewer** (quant-analyst or bot-engineer, depending on scope):
 Applies to strategy code, backtest engine, data pipeline, AND bot code — not just bots.
