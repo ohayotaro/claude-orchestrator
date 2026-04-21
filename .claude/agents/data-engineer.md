@@ -6,6 +6,10 @@ Specialist in financial market data pipelines.
 - Centralized exchange APIs (CEX) for crypto market data — OHLCV, order book, funding rates
 - Broker/platform APIs for traditional market data (FX, futures, equities)
 - Free/open data providers for supplementary data (equity, ETF, FX)
+- Corporate action feeds (splits, dividends, mergers, delistings)
+- Financial statement data (income statement, balance sheet, cash flow)
+- Earnings calendar and consensus estimates
+- Exchange trading calendar and holiday schedules
 - OHLCV data normalization, cleaning, and alignment
 - Parquet/HDF5 storage management
 - Data quality assurance (missing values, outliers, timezone handling)

@@ -2,17 +2,20 @@
   "_comment": "Agent routing keywords. Customize per project. agent-router.py falls back to built-in defaults if this file is missing or empty.",
   "data-engineer": [
     "data", "fetch", "pipeline", "ohlcv", "parquet", "csv",
-    "market data", "historical", "tick data", "candle"
+    "market data", "historical", "tick data", "candle",
+    "financial statement", "corporate action", "earnings calendar", "ex-date", "edinet", "edgar"
   ],
   "quant-analyst": [
     "backtest", "sharpe", "sortino", "drawdown", "var",
     "cvar", "monte carlo", "walk-forward", "bootstrap",
-    "performance", "metrics", "statistical"
+    "performance", "metrics", "statistical",
+    "valuation", "per", "pbr", "roe", "fundamental", "dividend yield", "beta"
   ],
   "strategist": [
     "strategy", "signal", "entry", "exit", "indicator",
     "moving average", "crossover", "momentum", "reversion",
-    "trend", "mean reversion"
+    "trend", "mean reversion",
+    "value", "growth", "sector rotation", "earnings", "dividend capture", "pair trading"
   ],
   "ea-developer": [
     "ea", "expert advisor", "mql5", "mql4", "metatrader",
@@ -21,7 +24,8 @@
   "bot-engineer": [
     "bot", "ccxt", "websocket", "async", "executor",
     "live trading", "order manager", "position tracker",
-    "testnet", "sandbox", "execution"
+    "testnet", "sandbox", "execution",
+    "broker api", "fix protocol", "market hours", "trading halt", "circuit breaker"
   ],
   "infra-ops": [
     "deploy", "docker", "dockerfile", "compose",
@@ -34,6 +38,7 @@
     "machine learning", "ml", "model", "train", "feature",
     "clustering", "classification", "regression",
     "regime", "walk-forward", "purge",
-    "hyperparameter", "ablation", "overfitting"
+    "hyperparameter", "ablation", "overfitting",
+    "earnings surprise", "sector momentum"
   ]
 }

@@ -130,6 +130,38 @@ async with aiosqlite.connect("bot_state.db") as db:
 4. If 3+ consecutive mismatches: emergency shutdown + alert
 5. Resume normal operation only after reconciliation
 
+## Equity Market Execution Patterns
+
+### Trading Hours Awareness
+```python
+from datetime import time
+from zoneinfo import ZoneInfo
+
+# Example: TSE trading hours
+MARKET_HOURS = {
+    "pre_open": (time(8, 0), time(9, 0)),    # Pre-open
+    "morning": (time(9, 0), time(11, 30)),     # Morning session
+    "lunch": (time(11, 30), time(12, 30)),     # Lunch break
+    "afternoon": (time(12, 30), time(15, 0)),  # Afternoon session
+}
+
+# Must check: is_market_open() before placing orders
+# Must handle: session boundaries, half-days, holidays
+```
+
+### Order Types for Equity
+- **Market orders**: Use sparingly — slippage risk in thin stocks
+- **Limit orders**: Preferred — specify price, respect tick size
+- **MOO/MOC** (Market-on-Open/Close): For auction participation
+- **Stop orders**: Not available on all exchanges — implement client-side if needed
+
+### Broker API Patterns
+Equity brokers use different protocols than crypto exchanges:
+- **FIX protocol**: Institutional standard (Interactive Brokers, etc.)
+- **REST/WebSocket**: Newer retail APIs
+- **Proprietary**: Some brokers have unique SDKs
+- **Key difference**: Order acknowledgment flow may include exchange-level confirmations
+
 ## Testing Requirements
 
 - **Testnet/sandbox mandatory**: All new bots must pass testnet before live

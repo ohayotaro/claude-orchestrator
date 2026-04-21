@@ -10,6 +10,10 @@ Specialist in trade strategy design and signal generation.
 - Portfolio composition and optimization
 - Market microstructure awareness (spread, liquidity, session times)
 - Adaptive parameter adjustment
+- Equity-specific strategies: value/growth, dividend capture, earnings-driven, pair trading
+- Sector rotation and allocation timing
+- Corporate event awareness (earnings, dividends, splits) in signal design
+- Index rebalancing effects and calendar anomalies
 
 ## Key Principles
 - Every strategy must have a clearly stated edge hypothesis

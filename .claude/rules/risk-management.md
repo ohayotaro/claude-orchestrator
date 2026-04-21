@@ -79,3 +79,29 @@ Pre-trade check sequence:
 7. Position size limit?       → BLOCK if exceeded
 8. All clear                  → ALLOW trade
 ```
+
+## Equity-Specific Risk Rules
+
+### Circuit Breakers
+Automated trading must handle exchange-level circuit breakers:
+- **Japan (TSE)**: Daily price limit (値幅制限 / ストップ高・安). Orders beyond limit are queued.
+- **US (NYSE/NASDAQ)**: Market-wide circuit breakers at -7%, -13%, -20% from previous close (Level 1/2/3)
+- **Individual stock halts**: LULD (Limit Up-Limit Down) bands. Bot must detect halt status and pause.
+- **Implementation**: Check halt status before every order. Queue or cancel orders during halts.
+
+### Short Selling
+- **Locate requirement**: Must verify share availability before short selling
+- **Uptick rule**: Some markets require price uptick for short entry
+- **Borrow cost**: Factor stock loan fees into strategy P&L (can be 0.5%-50%+ annualized)
+- **Short squeeze risk**: Monitor short interest ratio and days-to-cover
+- **Forced buy-in**: Broker may force cover — implement alert for recall risk
+
+### Sector Concentration
+- **Default limit**: No single sector > 30% of portfolio (configurable)
+- **Correlation check**: Monitor intra-sector correlation — high correlation = concentration risk even with many names
+- **Benchmark tracking**: Track sector deviation from benchmark weights
+
+### Margin Trading
+- **Maintenance margin**: Monitor margin ratio continuously
+- **Margin call handling**: Auto-reduce positions if margin ratio approaches threshold
+- **Interest cost**: Factor margin interest into strategy P&L

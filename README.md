@@ -52,10 +52,11 @@ Backtest → EA:     /data-pipeline → /strategy-design → /backtest → /opti
 API Bot:           /data-pipeline → /strategy-design → /backtest → /optimize → /bot-develop → /bot-deploy → /bot-monitor
 ML Pipeline:       /data-pipeline → /ml-pipeline → /backtest → /optimize → /bot-develop
 Live Operations:   /live-trading, /incident-response, /risk-report
+Equity:            /equity-screener → /earnings-calendar → /sector-analysis → /strategy-design
 Support:           /dashboard-develop, /notification-setup, /checkpointing
 ```
 
-### Available Skills (21)
+### Available Skills (24)
 
 | Skill | Description |
 |-------|-------------|
@@ -80,6 +81,9 @@ Support:           /dashboard-develop, /notification-setup, /checkpointing
 | `/ml-pipeline` | ML model training, feature engineering, walk-forward validation |
 | `/dashboard-develop` | Build FastAPI + Vite real-time trading dashboards |
 | `/notification-setup` | Integrate Discord, LINE, Telegram alert channels |
+| `/equity-screener` | Stock screening with fundamental/technical criteria |
+| `/earnings-calendar` | Manage earnings, dividends, and corporate events |
+| `/sector-analysis` | Sector performance, rotation signals, and allocation |
 
 ## Hooks (9)
 
