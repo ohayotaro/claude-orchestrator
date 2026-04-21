@@ -56,7 +56,7 @@ Equity:            /equity-screener → /earnings-calendar → /sector-analysis 
 Support:           /dashboard-develop, /notification-setup, /checkpointing
 ```
 
-### Available Skills (24)
+### Available Skills (25)
 
 | Skill | Description |
 |-------|-------------|
@@ -84,6 +84,7 @@ Support:           /dashboard-develop, /notification-setup, /checkpointing
 | `/equity-screener` | Stock screening with fundamental/technical criteria |
 | `/earnings-calendar` | Manage earnings, dividends, and corporate events |
 | `/sector-analysis` | Sector performance, rotation signals, and allocation |
+| `/ir-analysis` | Investor-focused corporate analysis from IR materials (Gemini + Codex) |
 
 ## Hooks (9)
 
