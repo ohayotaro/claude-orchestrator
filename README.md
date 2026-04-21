@@ -128,13 +128,13 @@ Operations:    /live-trading, /incident-response, /risk-report
 | `financial-domain.md` | 全体 | 数値精度は取引所仕様準拠、ルックアヘッドバイアス禁止、取引コスト (spread + commission + slippage) 必須、OOS テスト必須 (IS:OOS >= 70:30)、コーポレートアクション調整、取引時間制約 |
 | `risk-management.md` | 全体 | ストップロス必須、1 トレード最大リスク 1-2%、日次損失上限 5%、多層セーフティゲート (KillSwitch, Exchange Penalty Gate, Checkpoint Gate, Maintenance Gate, Margin Monitor)、サーキットブレーカー対応、空売り規制、セクター集中制限 |
 | `security.md` | 全体 | API キーは環境変数のみ、出金権限禁止、IP 制限推奨、testnet 必須、SSL/TLS 検証無効化禁止 |
-| `coding-principles.md` | 全体 | 型ヒント必須、mypy strict、docstring 必須 (公開API)、テストカバレッジ 80%+、ruff、MQL5: `#property strict` |
+| `coding-principles.md` | 全体 | 型ヒント必須、mypy strict、docstring 必須 (公開API)、テストカバレッジ 80%+、ruff、MQL5: `#property strict`、**外部 API 連携時は公式ドキュメント調査必須 (`api_specs/` に文書化)** |
 | `testing.md` | 全体 | 戦略: backtest + unit test、データ: 統合テスト (実API)、EA: MetaTrader Tester、リスク計算: 既知値照合 |
 | `language.md` | 全体 | ユーザー対話: 日本語、コード/エージェント指示: 英語、コミット: Conventional Commits |
-| `bot-development.md` | Bot | ccxt 標準パターン、WebSocket 自動リコネクト、asyncio ベストプラクティス、レート制限遵守、注文状態遷移管理、Pluggable StateStore (SQLite WAL default)、取引所固有アダプターパターン、取引時間制御 |
+| `bot-development.md` | Bot | ccxt 標準パターン、WebSocket 自動リコネクト、asyncio ベストプラクティス、レート制限遵守、注文状態遷移管理、Pluggable StateStore (SQLite WAL default)、取引所固有アダプター、取引時間制御、**構造化ログ契約 (Bot↔監視層インターフェース: lifecycle/orders/positions/safety/perf の5カテゴリ必須イベント)** |
 | `deployment.md` | Bot | Docker マルチステージビルド、非 root ユーザー、ヘルスチェック必須、環境変数シークレット管理、systemd/launchd サービス、CI/CD、ロールバック手順 |
 | `monitoring.md` | Bot | 構造化ログ (JSON) 必須、コアメトリクス定義 (uptime, PnL, latency, errors)、アラート閾値 (configurable)、通知チャネル (webhook)、ログローテーション |
-| `document-lifecycle.md` | 全体 | 全ドキュメントの更新トリガー・責任・陳腐化検出。CLAUDE.md Zone B/C, DESIGN.md, api_specs/, reports/ の管理ポリシー。`/checkpointing` で自動チェック |
+| `document-lifecycle.md` | 全体 | 全ドキュメントの更新トリガー・責任・**Drift Detection** (Zone C 肥大化, DESIGN.md コード乖離, api_specs/ エンドポイント不一致, Playbook 欠落, routing 不整合の5条件)。`/checkpointing` Step 7 で自動チェック |
 | `codex-delegation.md` | 委譲 | Codex 委譲パターン: 設計レビュー (suggest)、デバッグ (full-auto)、応答フォーマット (TL;DR → Analysis → Plan → Code → Validation → Risks) |
 | `gemini-delegation.md` | 委譲 | Gemini 委譲パターン: チャート分析、PDF 解析、リサーチ。出力: 構造化 Markdown + 確信度 (High/Medium/Low) |
 
@@ -253,7 +253,7 @@ claude-orchestrator/
 │   ├── settings.json                # Hook・権限・環境変数
 │   ├── agents/                      # 9 エージェント定義
 │   ├── hooks/                       # 9 Python Hook
-│   ├── rules/                       # 11 ドメインルール
+│   ├── rules/                       # 12 ドメインルール
 │   ├── skills/                      # 25 スキル (SKILL.md)
 │   ├── routing-keywords.json        # ルーティング設定 (customizable)
 │   ├── backtest-thresholds.json     # 閾値設定 (customizable)
