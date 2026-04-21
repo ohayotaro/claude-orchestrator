@@ -32,21 +32,20 @@ ls -t .claude/checkpoints/*.md 2>/dev/null | head -1
 ```
 
 **Decision logic:**
+
+Compare the current work context with the latest checkpoint's "Active Work" section:
+
 | Condition | Action | Rationale |
 |-----------|--------|-----------|
 | No previous checkpoint exists | **Create new** | First checkpoint |
-| Same git branch AND <5 new commits since last checkpoint | **Update existing** | Same work stream, incremental progress |
-| Different git branch | **Create new** | Different work context |
-| >=5 new commits since last checkpoint | **Create new** | Enough progress to warrant a separate snapshot |
-| Last checkpoint's "Active Work" task changed | **Create new** | Switched to a different task |
+| Same task/objective as latest checkpoint | **Update existing** | Incremental progress on the same work |
+| Task or objective changed | **Create new** | Different work context deserves its own snapshot |
+| Different git branch | **Create new** | Branch switch implies context switch |
+| Different skill pipeline in use | **Create new** | Shifted from e.g. strategy development to bot deployment |
 
-**To check commits since last checkpoint:**
-```bash
-# Extract last checkpoint's commit hash
-LAST_HASH=$(grep -m1 'Last commit:' .claude/checkpoints/latest.md | awk '{print $NF}')
-# Count new commits
-git rev-list --count ${LAST_HASH}..HEAD
-```
+**How to determine "same task":** Read the latest checkpoint's `## Active Work` section. If the current task description, target files, or skill being used differ, it is a new context.
+
+Commit count is NOT a factor — a single commit can represent a complete task switch, while 20 commits may be incremental work on the same task.
 
 **When updating**: Overwrite the existing file's content but keep the same filename. Update the timestamp inside the document.
 
