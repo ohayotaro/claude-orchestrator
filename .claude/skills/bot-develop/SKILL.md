@@ -83,19 +83,29 @@ Interface contracts: {define function signatures between modules}
 - Auto-reconnect with exponential backoff
 - Message queue for processing
 
-### Step 5: Implement Risk Controls
+### Step 5: Implement Structured Logging
+Implement the log events defined in `bot-development.md` "Structured Logging Contract":
+- Lifecycle events: `bot_started`, `bot_stopped`, `bot_heartbeat` (every 60s)
+- Order events: `order_created`, `order_submitted`, `order_filled`, `order_cancelled`, `order_rejected`
+- Position events: `position_opened`, `position_closed`, `position_update` (every 30s while open)
+- Safety events: `safety_triggered`, `reconnect`, `reconciliation`
+- Performance snapshots: `perf_snapshot` (every 5 min)
+
+All events output as JSONL to stdout + `logs/bot.jsonl`. This is the contract that enables `/bot-monitor`, `/incident-response`, and `/dashboard-develop` to consume bot state.
+
+### Step 6: Implement Risk Controls
 - Pre-trade balance check
 - Position size limit enforcement
 - Daily loss limit check
 - Max concurrent orders check
 - Spread/slippage guard
 
-### Step 6: Implement Dry-Run Mode
+### Step 7: Implement Dry-Run Mode
 - `--dry-run` flag: log orders without executing
 - Paper trading: simulate fills with real market data
 - Same code path as live — only the exchange client is mocked
 
-### Step 7: Codex Review
+### Step 8: Codex Review
 Delegate to Codex for async pattern and error handling review:
 ```bash
 codex -a on-request "Review this trading bot for:
@@ -106,7 +116,7 @@ codex -a on-request "Review this trading bot for:
 5. Graceful shutdown (pending orders, open positions)"
 ```
 
-### Step 8: Testnet Verification
+### Step 9: Testnet Verification
 1. Run on exchange testnet/sandbox
 2. Place and cancel orders
 3. Verify position tracking accuracy

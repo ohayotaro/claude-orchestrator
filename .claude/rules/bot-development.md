@@ -69,6 +69,57 @@ CREATED → SUBMITTED → OPEN → PARTIALLY_FILLED → FILLED
 - Store full order history in persistent storage
 - Reconcile local state with exchange state periodically
 
+## Structured Logging Contract (Mandatory)
+
+Every bot MUST emit structured JSON logs (via structlog or equivalent) for the following events. This is the contract between the bot and the orchestrator's monitoring layer (`/bot-monitor`, `/incident-response`, `/dashboard-develop`).
+
+### Mandatory Log Events
+
+**Lifecycle:**
+```json
+{"event": "bot_started",    "strategy": "...", "version": "...", "config_hash": "...", "ts": "ISO8601"}
+{"event": "bot_stopped",    "reason": "user|kill_switch|error|maintenance", "uptime_s": 3600, "ts": "..."}
+{"event": "bot_heartbeat",  "uptime_s": 3600, "open_positions": 2, "daily_pnl": -0.5, "ts": "..."}
+```
+Heartbeat interval: every 60 seconds (configurable).
+
+**Orders:**
+```json
+{"event": "order_created",  "order_id": "...", "symbol": "...", "side": "buy", "type": "limit", "size": 0.01, "price": 65000.0, "ts": "..."}
+{"event": "order_submitted","order_id": "...", "exchange_id": "...", "ts": "..."}
+{"event": "order_filled",   "order_id": "...", "fill_price": 65001.5, "fill_size": 0.01, "slippage_bps": 2.3, "ts": "..."}
+{"event": "order_cancelled","order_id": "...", "reason": "timeout|user|exchange", "ts": "..."}
+{"event": "order_rejected", "order_id": "...", "reason": "insufficient_balance", "ts": "..."}
+```
+
+**Positions:**
+```json
+{"event": "position_opened","symbol": "...", "side": "long", "size": 0.01, "entry_price": 65000.0, "ts": "..."}
+{"event": "position_closed","symbol": "...", "side": "long", "size": 0.01, "exit_price": 65500.0, "pnl": 5.0, "pnl_pct": 0.77, "holding_s": 1800, "ts": "..."}
+{"event": "position_update","symbol": "...", "unrealized_pnl": 3.2, "unrealized_pnl_pct": 0.49, "ts": "..."}
+```
+Position update interval: every 30 seconds while a position is open (configurable).
+
+**Safety:**
+```json
+{"event": "safety_triggered","gate": "daily_loss_limit", "details": "daily loss -5.1% exceeds -5.0% threshold", "action": "block_new_entries", "ts": "..."}
+{"event": "reconnect",      "target": "websocket", "attempt": 3, "backoff_s": 8, "ts": "..."}
+{"event": "reconciliation", "status": "mismatch", "local_size": 0.01, "exchange_size": 0.0, "ts": "..."}
+```
+
+**Performance (periodic, every 5 minutes):**
+```json
+{"event": "perf_snapshot",  "api_latency_p50_ms": 45, "api_latency_p99_ms": 230, "api_errors_1h": 2, "ws_reconnects_1h": 0, "ts": "..."}
+```
+
+### Log Output Rules
+- Format: JSON, one event per line (JSONL)
+- Output: stdout (for Docker/systemd capture) AND file (`logs/bot.jsonl`)
+- All events include `ts` (ISO 8601 UTC) and `event` (snake_case event name)
+- Sensitive data (API keys, secrets) MUST NEVER appear in logs
+- Log level mapping: lifecycle=INFO, orders=INFO, positions=INFO, safety=WARNING, errors=ERROR, heartbeat=DEBUG
+- Rotation: 100MB per file, 10 files retained (configurable via monitoring.md)
+
 ## Exchange-Specific Adapters (Non-ccxt Exchanges)
 
 For exchanges not fully supported by ccxt, build direct adapters:
