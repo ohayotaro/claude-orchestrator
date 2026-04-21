@@ -90,11 +90,48 @@ These events SHOULD trigger document updates (enforced by skill workflows and or
 /bot-develop Step 2    → src/data/api_specs/ (create or update)
 ```
 
-## Staleness Detection
+## Drift Detection
 
-The orchestrator should periodically check (on `/checkpointing` or session start):
+The orchestrator checks the following conditions on `/checkpointing` or session start. Each condition describes a concrete state where a document no longer reflects reality.
 
-1. **CLAUDE.md Zone C**: >50 lines? → Summarize older entries
-2. **DESIGN.md**: Last updated >30 days ago while code changed significantly? → Flag for review
-3. **api_specs/**: Any spec >6 months old? → Flag for re-research
-4. **CODEX_HANDOFF_PLAYBOOK.md**: New skills added since last update? → Flag for new templates
+### 1. CLAUDE.md Zone C — Context Overload
+
+**Condition**: Zone C exceeds 50 lines.
+
+**Problem**: Old investigation notes, rejected approaches, and current decisions are intermixed. The orchestrator may treat a discarded idea as an active constraint.
+
+**Action**: Summarize older entries into a 5-line digest. Remove entries for work that is already committed and reflected in code.
+
+### 2. DESIGN.md — Code/Document Divergence
+
+**Condition**: `git log --since="$(stat -f %Sm -t %Y-%m-%d .claude/docs/DESIGN.md)" --oneline -- src/ mql5/` returns commits that add, rename, or remove modules not reflected in DESIGN.md.
+
+**Problem**: A new module exists in code but has no architecture decision record. Or DESIGN.md describes a module that was deleted or renamed.
+
+**Action**: For each divergence, either (a) add an ADR for the new module, or (b) remove/update the stale ADR. Flag to user with the specific file mismatches.
+
+### 3. api_specs/ — Endpoint/Version Mismatch
+
+**Condition**: The `## Base URL` or `## Endpoints Used` section in an api_spec document does not match the URLs/paths used in the corresponding Python client code (`grep -r "base_url\|endpoint\|/api/v" src/data/ src/bot/`).
+
+**Problem**: The exchange updated their API (version bump, endpoint deprecation, new rate limits), but the spec was not re-researched. Implementation may use deprecated endpoints or violate new rate limits.
+
+**Action**: Re-run the API specification research (Gemini or official docs). Update the spec. Verify client code matches.
+
+**Secondary check**: If the spec file's last-modified date is >6 months old AND the code references it, flag for verification regardless.
+
+### 4. CODEX_HANDOFF_PLAYBOOK.md — Missing Templates
+
+**Condition**: A skill in `.claude/skills/` contains `codex --approval-mode` or `Bash(codex *)` in its SKILL.md, but no corresponding template section exists in CODEX_HANDOFF_PLAYBOOK.md.
+
+**Problem**: Codex delegation happens via ad-hoc prompts instead of the vetted playbook templates, leading to inconsistent quality.
+
+**Action**: For each unmatched skill, add a playbook template section based on the skill's Codex usage pattern.
+
+### 5. routing-keywords.json — Agent/Keyword Mismatch
+
+**Condition**: An agent exists in `.claude/agents/` but has no corresponding entry in `routing-keywords.json`, or an entry references an agent that no longer exists.
+
+**Problem**: The agent-router hook cannot route prompts to the agent, so it is never automatically suggested.
+
+**Action**: Add keywords for the missing agent, or remove the orphaned entry.

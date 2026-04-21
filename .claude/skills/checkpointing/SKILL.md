@@ -62,11 +62,16 @@ Scan session history for patterns that should be extracted:
 Append checkpoint summary to CLAUDE.md Zone C for cross-session persistence.
 If Zone C exceeds 50 lines, summarize older entries and trim.
 
-### Step 6: Document Staleness Check
-Review per `document-lifecycle.md` rules:
-- [ ] CLAUDE.md Zone C: >50 lines? → Summarize
-- [ ] DESIGN.md: Updated since last structural code change?
-- [ ] api_specs/: Any spec >6 months old? → Flag for re-research
-- [ ] CODEX_HANDOFF_PLAYBOOK.md: New skills added since last update? → Flag
+### Step 6: Document Drift Detection
+Run each check defined in `document-lifecycle.md` "Drift Detection" section:
 
-Report any stale documents to the user with recommended action.
+1. **Zone C Overload**: Count lines in Zone C. If >50, summarize old entries and trim.
+2. **DESIGN.md Divergence**: Run `git log --since=<DESIGN.md mtime> -- src/ mql5/` — if commits added/removed modules not in DESIGN.md, list the mismatches.
+3. **api_specs/ Mismatch**: For each spec file, grep the corresponding client code for base URL and endpoint paths. Flag if they differ from the spec.
+4. **Playbook Gaps**: List skills that use `codex` in their SKILL.md but have no section in CODEX_HANDOFF_PLAYBOOK.md.
+5. **Routing Gaps**: Compare agent names in `.claude/agents/` with keys in `routing-keywords.json`. Flag missing or orphaned entries.
+
+Report each detected issue to the user with:
+- **What**: Which document is out of sync
+- **Why**: What changed in code/config that the document doesn't reflect
+- **Action**: Specific fix (update ADR, re-research API, add playbook template, etc.)
