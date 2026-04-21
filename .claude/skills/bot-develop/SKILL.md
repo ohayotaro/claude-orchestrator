@@ -19,16 +19,33 @@ Ask the user:
 4. Strategy to implement (reference from `src/strategies/`)
 5. Execution mode (REST polling, WebSocket event-driven, or hybrid)
 
-### Step 2: Architecture Design
-Using the **bot-engineer** subagent, design:
-- Execution engine (ccxt async or exchange SDK)
-- Order manager (state machine: create → submit → open → fill/cancel)
+### Step 2: Exchange API Specification Research (MANDATORY)
+
+**No implementation may begin until the target exchange's API spec is documented.**
+
+Research via Gemini CLI or official documentation:
+- REST API: base URL, authentication (HMAC, API key header), order endpoints, position endpoints
+- WebSocket API: connection URL, protocol (JSON-RPC, proprietary), subscription format, heartbeat
+- Rate limits: requests per second/minute, weight system, order-specific limits
+- Order types supported: market, limit, stop, trailing — and their parameters
+- WebSocket message format: execution stream, order update stream, position stream
+- Error codes: order rejection reasons, insufficient balance, rate limit exceeded
+- Testnet/sandbox: availability, base URL, how to enable
+
+Document in `src/data/api_specs/{exchange_name}.md`.
+
+If using ccxt: verify that ccxt's implementation matches the exchange's current API version (ccxt may lag behind or have bugs for specific exchanges).
+
+### Step 3: Architecture Design
+Using the **bot-engineer** subagent, design based on researched API spec:
+- Execution engine (ccxt async or direct exchange SDK — choose based on API spec findings)
+- Order manager (state machine: create → submit → open → fill/cancel, matching exchange's actual order lifecycle)
 - Position tracker (real-time PnL, unrealized/realized)
-- WebSocket manager (price streams, order updates, reconnection)
+- WebSocket manager (price streams, order updates, reconnection — matching exchange's actual protocol)
 - Risk controller (pre-trade checks, position limits)
 - Configuration (environment variables, CLI args)
 
-### Step 3: Implement Core Components
+### Step 4: Implement Core Components
 Create modules in `src/bot/`:
 
 **executor.py** — Order execution engine:
@@ -48,19 +65,19 @@ Create modules in `src/bot/`:
 - Auto-reconnect with exponential backoff
 - Message queue for processing
 
-### Step 4: Implement Risk Controls
+### Step 5: Implement Risk Controls
 - Pre-trade balance check
 - Position size limit enforcement
 - Daily loss limit check
 - Max concurrent orders check
 - Spread/slippage guard
 
-### Step 5: Implement Dry-Run Mode
+### Step 6: Implement Dry-Run Mode
 - `--dry-run` flag: log orders without executing
 - Paper trading: simulate fills with real market data
 - Same code path as live — only the exchange client is mocked
 
-### Step 6: Codex Review
+### Step 7: Codex Review
 Delegate to Codex for async pattern and error handling review:
 ```bash
 codex --approval-mode suggest "Review this trading bot for:
@@ -71,7 +88,7 @@ codex --approval-mode suggest "Review this trading bot for:
 5. Graceful shutdown (pending orders, open positions)"
 ```
 
-### Step 7: Testnet Verification
+### Step 8: Testnet Verification
 1. Run on exchange testnet/sandbox
 2. Place and cancel orders
 3. Verify position tracking accuracy
