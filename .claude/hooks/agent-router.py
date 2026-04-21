@@ -4,12 +4,72 @@
 Priority:
   1. Gemini — multimodal file references (images, PDFs)
   2. Codex  — design, debug, optimization, algorithm keywords
-  3. Specialized subagent — financial domain keywords
+  3. Specialized subagent — configurable domain keywords
+
+Keywords are loaded from .claude/routing-keywords.json if present,
+otherwise built-in defaults are used.
 """
 
 import json
+import os
 import re
 import sys
+
+# Built-in defaults (used when routing-keywords.json is missing or empty)
+DEFAULT_ROUTING: dict[str, list[str]] = {
+    "data-engineer": [
+        "data", "fetch", "pipeline", "ohlcv", "parquet", "csv",
+        "market data", "historical", "tick data", "candle",
+    ],
+    "quant-analyst": [
+        "backtest", "sharpe", "sortino", "drawdown", "var",
+        "cvar", "monte carlo", "walk-forward", "bootstrap",
+        "performance", "metrics", "statistical",
+    ],
+    "strategist": [
+        "strategy", "signal", "entry", "exit", "indicator",
+        "moving average", "crossover", "momentum", "reversion",
+        "trend", "mean reversion",
+    ],
+    "ea-developer": [
+        "ea", "expert advisor", "mql5", "mql4", "metatrader",
+        "ontick", "ctrade",
+    ],
+    "bot-engineer": [
+        "bot", "ccxt", "websocket", "async", "executor",
+        "live trading", "order manager", "position tracker",
+        "testnet", "sandbox", "execution",
+    ],
+    "infra-ops": [
+        "deploy", "docker", "dockerfile", "compose",
+        "systemd", "kubernetes", "k8s", "vps", "cloud",
+        "monitor", "alert", "grafana", "prometheus",
+        "health check", "log", "ci/cd", "pipeline",
+        "dashboard", "notification", "launchd",
+    ],
+    "ml-engineer": [
+        "machine learning", "ml", "model", "train", "feature",
+        "clustering", "classification", "regression",
+        "regime", "walk-forward", "purge",
+        "hyperparameter", "ablation", "overfitting",
+    ],
+}
+
+
+def load_routing_config() -> dict[str, list[str]]:
+    """Load routing keywords from project config, fall back to defaults."""
+    config_path = os.path.join(
+        os.environ.get("CLAUDE_PROJECT_DIR", "."),
+        ".claude", "routing-keywords.json",
+    )
+    try:
+        with open(config_path) as f:
+            config = json.load(f)
+        # Filter out comment keys and empty entries
+        routing = {k: v for k, v in config.items() if not k.startswith("_") and v}
+        return routing if routing else DEFAULT_ROUTING
+    except (FileNotFoundError, json.JSONDecodeError):
+        return DEFAULT_ROUTING
 
 
 def main() -> None:
@@ -33,7 +93,7 @@ def main() -> None:
     multimodal_patterns = [
         r"\.(png|jpg|jpeg|gif|svg|webp|bmp|tiff)",
         r"\.(pdf|doc|docx|xls|xlsx)",
-        r"chart|チャート|画像|image|screenshot|スクリーンショット",
+        r"chart|image|screenshot|diagram|picture",
     ]
     for pattern in multimodal_patterns:
         if re.search(pattern, prompt_lower):
@@ -48,60 +108,16 @@ def main() -> None:
     codex_keywords = [
         "design", "architect", "debug", "error", "traceback",
         "optimize", "algorithm", "review", "refactor",
-        "設計", "デバッグ", "エラー", "最適化", "レビュー",
     ]
     if any(kw in prompt_lower for kw in codex_keywords):
         suggestions.append(
             "ROUTING: This task may benefit from deep reasoning. "
             "Consider delegating to Codex CLI: "
-            "`codex --approval-mode suggest \"{task}\"`"
+            '`codex --approval-mode suggest "{task}"`'
         )
 
-    # --- Priority 3: Specialized subagent ---
-    agent_routing = {
-        "data-engineer": [
-            "data", "fetch", "pipeline", "ohlcv", "parquet",
-            "binance", "bybit", "yfinance", "mt5",
-            "データ", "取得", "パイプライン",
-        ],
-        "quant-analyst": [
-            "backtest", "sharpe", "sortino", "drawdown", "var",
-            "cvar", "monte carlo", "walk-forward", "bootstrap",
-            "バックテスト", "リスク",
-        ],
-        "strategist": [
-            "strategy", "signal", "entry", "exit", "indicator",
-            "rsi", "macd", "moving average", "crossover",
-            "ストラテジー", "シグナル", "戦略",
-        ],
-        "ea-developer": [
-            "ea", "expert advisor", "mql5", "mql4", "metatrader",
-            "ontick", "ctrade",
-        ],
-        "bot-engineer": [
-            "bot", "ccxt", "websocket", "async", "executor",
-            "live trading", "order manager", "position tracker",
-            "python-binance", "pybit", "testnet", "sandbox",
-            "ボット", "自動売買", "ライブ",
-        ],
-        "infra-ops": [
-            "deploy", "docker", "dockerfile", "compose",
-            "systemd", "kubernetes", "k8s", "vps", "cloud",
-            "monitor", "alert", "grafana", "prometheus",
-            "health check", "log", "ci/cd", "pipeline",
-            "dashboard", "fastapi", "notification", "discord",
-            "launchd", "plist",
-            "デプロイ", "監視", "インフラ", "ダッシュボード", "通知",
-        ],
-        "ml-engineer": [
-            "machine learning", "ml", "model", "train", "feature",
-            "hmm", "lightgbm", "xgboost", "cnn", "lstm",
-            "clustering", "kmeans", "gmm", "hdbscan", "som",
-            "regime", "classification", "walk-forward", "purge",
-            "optuna", "hyperparameter", "ablation", "overfitting",
-            "機械学習", "特徴量", "レジーム", "学習",
-        ],
-    }
+    # --- Priority 3: Specialized subagent (config-driven) ---
+    agent_routing = load_routing_config()
 
     for agent, keywords in agent_routing.items():
         if any(kw in prompt_lower for kw in keywords):

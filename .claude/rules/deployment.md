@@ -104,7 +104,9 @@ WantedBy=multi-user.target
 5. Verify health check passes
 6. Monitor for 15 minutes before confirming
 
-## macOS launchd Deployment
+## macOS launchd (Optional Alternative)
+
+> **Note**: For local/development deployment on macOS. For production, prefer Docker or systemd.
 
 For local/dev deployment on macOS (alternative to Docker):
 

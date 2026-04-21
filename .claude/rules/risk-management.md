@@ -55,8 +55,8 @@ Beyond basic risk limits, production bots MUST implement exchange-specific safet
 | Gate | Trigger | Action |
 |------|---------|--------|
 | **KillSwitch** | File-based (`data/KILL`) or signal | Immediate full stop, close all positions |
-| **SFD Gate** | FX-Spot deviation approaches penalty threshold (e.g., >5% on bitFlyer) | Block new entries |
-| **Funding Gate** | Approaching funding checkpoint time | Close positions before checkpoint |
+| **Exchange Penalty Gate** | Exchange-specific deviation/penalty mechanisms approach threshold (e.g., FX-Spot deviation on certain exchanges) | Block new entries |
+| **Checkpoint Gate** | Approaching exchange-specific checkpoint (funding, settlement, maintenance, etc.) | Close positions before checkpoint |
 | **Maintenance Gate** | Approaching exchange maintenance window | Close positions, pause bot |
 | **Margin Monitor** | Margin ratio exceeds alert threshold (e.g., >80%) | Block entries; >95% → emergency close |
 | **Daily Loss Limit** | Cumulative daily PnL exceeds threshold | Stop new entries for the day |
@@ -72,8 +72,8 @@ Beyond basic risk limits, production bots MUST implement exchange-specific safet
 Pre-trade check sequence:
 1. KillSwitch active?         → BLOCK (exit code 0, no restart)
 2. Maintenance window?        → BLOCK (close positions)
-3. Funding checkpoint near?   → BLOCK (close positions)
-4. SFD gate triggered?        → BLOCK new entries
+3. Exchange checkpoint near?   → BLOCK (close positions)
+4. Exchange penalty gate?      → BLOCK new entries
 5. Margin ratio > threshold?  → BLOCK new entries
 6. Daily loss limit hit?      → BLOCK new entries
 7. Position size limit?       → BLOCK if exceeded

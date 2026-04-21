@@ -1,0 +1,39 @@
+{
+  "_comment": "Agent routing keywords. Customize per project. agent-router.py falls back to built-in defaults if this file is missing or empty.",
+  "data-engineer": [
+    "data", "fetch", "pipeline", "ohlcv", "parquet", "csv",
+    "market data", "historical", "tick data", "candle"
+  ],
+  "quant-analyst": [
+    "backtest", "sharpe", "sortino", "drawdown", "var",
+    "cvar", "monte carlo", "walk-forward", "bootstrap",
+    "performance", "metrics", "statistical"
+  ],
+  "strategist": [
+    "strategy", "signal", "entry", "exit", "indicator",
+    "moving average", "crossover", "momentum", "reversion",
+    "trend", "mean reversion"
+  ],
+  "ea-developer": [
+    "ea", "expert advisor", "mql5", "mql4", "metatrader",
+    "ontick", "ctrade"
+  ],
+  "bot-engineer": [
+    "bot", "ccxt", "websocket", "async", "executor",
+    "live trading", "order manager", "position tracker",
+    "testnet", "sandbox", "execution"
+  ],
+  "infra-ops": [
+    "deploy", "docker", "dockerfile", "compose",
+    "systemd", "kubernetes", "k8s", "vps", "cloud",
+    "monitor", "alert", "grafana", "prometheus",
+    "health check", "log", "ci/cd", "pipeline",
+    "dashboard", "notification", "launchd"
+  ],
+  "ml-engineer": [
+    "machine learning", "ml", "model", "train", "feature",
+    "clustering", "classification", "regression",
+    "regime", "walk-forward", "purge",
+    "hyperparameter", "ablation", "overfitting"
+  ]
+}

@@ -47,7 +47,7 @@ Provide confidence level (High/Medium/Low) for each finding." -f chart.png
 
 ### Step 6: Cross-Market Correlation
 - Analyze correlation between related instruments
-- Detect divergences (e.g., BTC vs ETH, USD/JPY vs Nikkei)
+- Detect divergences (e.g., related instruments in the user's portfolio)
 - Identify leading/lagging relationships
 
 ### Step 7: Report Generation

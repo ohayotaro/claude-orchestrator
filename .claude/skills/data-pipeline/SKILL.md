@@ -1,6 +1,6 @@
 ---
 name: data-pipeline
-description: Build and manage market data acquisition, normalization, and storage pipelines. Supports Binance, bybit, MT5, and yfinance.
+description: Build and manage market data acquisition, normalization, and storage pipelines for any exchange or data provider.
 agent: data-engineer
 allowed-tools: "Bash(python *) Bash(uv *) Read Write Edit Glob Grep"
 ---
@@ -16,7 +16,7 @@ Ask the user:
 1. Target market and instruments (e.g., BTC/USDT, EUR/USD, ES futures)
 2. Timeframe (1m, 5m, 15m, 1h, 4h, 1d)
 3. Date range (start, end)
-4. Data source (Binance, bybit, MT5, yfinance)
+4. Data source (select from project's configured sources, or specify custom API)
 
 ### Step 2: Design Data Schema
 Using the **data-engineer** subagent, design:

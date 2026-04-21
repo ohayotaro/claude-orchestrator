@@ -56,15 +56,17 @@ logger.info("order_placed",
 
 | Condition | Severity | Action |
 |-----------|----------|--------|
-| Exchange disconnected > 30s | WARNING | Notify via webhook |
-| Exchange disconnected > 120s | CRITICAL | Pause trading + notify |
-| Daily loss > 3% of account | WARNING | Notify |
-| Daily loss > 5% of account | CRITICAL | Emergency stop + notify |
-| API error rate > 1% (5min window) | WARNING | Notify |
-| API error rate > 5% (5min window) | CRITICAL | Pause trading + notify |
-| Order rejected 3x consecutively | WARNING | Notify + investigate |
-| No heartbeat > 60s | CRITICAL | Restart service |
-| Latency p99 > 5000ms | WARNING | Notify |
+| Exchange disconnected > 30s (configurable) | WARNING | Notify via webhook |
+| Exchange disconnected > 120s (configurable) | CRITICAL | Pause trading + notify |
+| Daily loss > 3% of account (configurable) | WARNING | Notify |
+| Daily loss > 5% of account (configurable) | CRITICAL | Emergency stop + notify |
+| API error rate > 1% (5min window) (configurable) | WARNING | Notify |
+| API error rate > 5% (5min window) (configurable) | CRITICAL | Pause trading + notify |
+| Order rejected 3x consecutively (configurable) | WARNING | Notify + investigate |
+| No heartbeat > 60s (configurable) | CRITICAL | Restart service |
+| Latency p99 > 5000ms (configurable) | WARNING | Notify |
+
+> **Note**: All thresholds are defaults and should be adjusted per project via `.claude/backtest-thresholds.json` or project configuration.
 
 ## Notification Channels
 

@@ -3,13 +3,13 @@
 Specialist in machine learning model development for financial time series.
 
 ## Expertise
-- **Supervised learning**: LightGBM, XGBoost, PyTorch (1D CNN, LSTM), MiniRocket
-- **Unsupervised learning**: HMM (hmmlearn), GMM, K-Means, HDBSCAN, SOM
-- **Regime detection**: Markov-Switching, Kalman Filter, changepoint detection (PELT/ruptures)
-- **Feature engineering**: Technical indicators (150+ via pandas-ta), volatility measures (Parkinson, Garman-Klass), price profiles, lag features
+- **Supervised learning**: Gradient boosting, neural networks, time series classifiers (e.g., LightGBM, PyTorch, MiniRocket)
+- **Unsupervised learning**: Hidden Markov models, clustering, density-based methods (e.g., HMM, GMM, K-Means, HDBSCAN)
+- **Regime detection**: State-space models, changepoint detection, switching regression
+- **Feature engineering**: Technical indicators, volatility measures, price profiles, lag features
 - **Walk-forward validation**: Purge/embargo anti-leakage, expanding/rolling windows
 - **Overfitting detection**: IS/OOS comparison, CSCV, Deflated Sharpe Ratio, White's Reality Check
-- **Hyperparameter optimization**: Optuna (Bayesian, TPE, pruning), grid/random search
+- **Hyperparameter optimization**: Bayesian search, pruning, cross-validation (e.g., Optuna)
 - **Statistical validation**: Permutation tests, bootstrap CI, Diebold-Mariano
 - **Time series**: aeon, statsmodels (ARIMA, GARCH), PyWavelets
 

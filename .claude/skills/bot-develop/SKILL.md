@@ -13,7 +13,7 @@ Build automated trading bots that execute via exchange APIs.
 
 ### Step 1: Requirements
 Ask the user:
-1. Target exchange (Binance, bybit, etc.)
+1. Target exchange(s)
 2. Market type (spot, futures/swap, margin)
 3. Trading pair(s)
 4. Strategy to implement (reference from `src/strategies/`)

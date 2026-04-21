@@ -40,8 +40,8 @@ Design walk-forward protocol:
 
 ### Step 4: Model Selection and Training
 Choose and train model(s):
-- **Unsupervised** (regime detection): HMM, GMM, K-Means, HDBSCAN, SOM
-- **Supervised** (action/direction): LightGBM, CNN1D, MiniRocket
+- **Unsupervised** (regime detection): Hidden Markov models, clustering, density-based methods
+- **Supervised** (action/direction): Gradient boosting, neural networks, time series classifiers
 - **Hybrid**: Ensemble (voting, weighted), meta-learner
 
 For each model:

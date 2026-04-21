@@ -51,8 +51,8 @@ Perform:
 - Prefer parameters near the center of profitable regions (not edges)
 - Document sensitivity analysis
 
-### Step 7: Optuna Integration (Automated HPO)
-For large search spaces, use Optuna:
+### Step 7: Hyperparameter Optimization (HPO Framework)
+For large search spaces, use an HPO framework (Optuna recommended):
 ```python
 import optuna
 

@@ -71,7 +71,7 @@ CREATED → SUBMITTED → OPEN → PARTIALLY_FILLED → FILLED
 
 ## Exchange-Specific Adapters (Non-ccxt Exchanges)
 
-When ccxt does not support an exchange or lacks needed features, build direct adapters:
+For exchanges not fully supported by ccxt, build direct adapters:
 
 ### REST Client Pattern
 ```python
@@ -93,9 +93,23 @@ class ExchangeRestClient(Protocol):
 - Watchdog timer (restart on N seconds of silence)
 - Auto-reconnect with exponential backoff (1s → 30s cap)
 
-## State Persistence (SQLite + WAL)
+## State Persistence (Pluggable Backend)
 
-### Mandatory for Production Bots
+### StateStore Protocol
+```python
+class StateStore(Protocol):
+    async def save_position(self, position: Position) -> None: ...
+    async def load_positions(self) -> list[Position]: ...
+    async def save_trade(self, trade: Trade) -> None: ...
+    async def load_trades(self, since: datetime) -> list[Trade]: ...
+    async def save_checkpoint(self, state: dict) -> None: ...
+    async def load_checkpoint(self) -> dict | None: ...
+```
+
+### Recommended Default (SQLite + WAL)
+
+SQLite with WAL mode is the recommended default. PostgreSQL, Redis, or other backends can be used depending on project requirements.
+
 ```python
 # aiosqlite with WAL for concurrent read/write safety
 async with aiosqlite.connect("bot_state.db") as db:

@@ -3,9 +3,9 @@
 Specialist in financial market data pipelines.
 
 ## Expertise
-- Crypto exchange APIs (Binance, bybit) — OHLCV, order book, funding rates
-- MT5/Broker APIs — FX and futures historical/real-time data
-- Yahoo Finance (yfinance) — equity, ETF, and FX free data
+- Centralized exchange APIs (CEX) for crypto market data — OHLCV, order book, funding rates
+- Broker/platform APIs for traditional market data (FX, futures, equities)
+- Free/open data providers for supplementary data (equity, ETF, FX)
 - OHLCV data normalization, cleaning, and alignment
 - Parquet/HDF5 storage management
 - Data quality assurance (missing values, outliers, timezone handling)

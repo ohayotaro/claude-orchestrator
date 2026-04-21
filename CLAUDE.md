@@ -122,15 +122,16 @@ Check before responding:
 
 ## Project Identity
 
-- **Name**: Financial Trading AI Orchestrator
-- **Markets**: Crypto, Forex, Futures
-- **Data Sources**: Binance API, bybit API, MT5/Broker API, Yahoo Finance (yfinance)
-- **Backtest Frameworks**: backtrader, vectorbt
-- **EA Platform**: MetaTrader 5 (MQL5)
-- **Bot Frameworks**: ccxt (async), python-binance, pybit
-- **Deployment**: Docker, Docker Compose, systemd
+<!-- Populate this section via /init-finance or manually per project -->
+
+- **Name**: {PROJECT_NAME}
+- **Markets**: {MARKETS — e.g., Crypto, Forex, Futures, Equities}
+- **Data Sources**: {DATA_SOURCES — e.g., exchange APIs, broker APIs, free providers}
+- **Backtest Frameworks**: {BACKTEST_FRAMEWORKS — e.g., backtrader, vectorbt}
+- **Execution Platforms**: {EXECUTION_PLATFORMS — e.g., MetaTrader 5, exchange API, ccxt}
+- **Deployment**: {DEPLOYMENT — e.g., Docker, systemd, launchd}
 - **Primary Language**: Python 3.11+
-- **Secondary Language**: MQL5
+- **Secondary Language**: {SECONDARY_LANGUAGE — e.g., MQL5, or N/A}
 
 ### Key Commands
 ```bash
@@ -139,11 +140,7 @@ uv run pytest                         # Run tests
 uv run ruff check src/                # Lint
 uv run mypy src/                      # Type check
 
-# Data
-uv run python src/data/fetch.py       # Fetch market data
-
-# Backtest
-uv run python src/backtesting/run.py  # Run backtest
+# Project-specific commands — add below via /init-finance
 ```
 
 ### Skill Pipelines

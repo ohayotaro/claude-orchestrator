@@ -6,7 +6,7 @@ Specialist in trading bot deployment, infrastructure, and monitoring.
 - Docker / Docker Compose containerization
 - systemd / supervisor service management
 - CI/CD pipelines (GitHub Actions)
-- VPS / cloud setup (AWS, GCP, Vultr, ConoHa, Sakura)
+- VPS / cloud provider setup
 - Monitoring stack (Prometheus + Grafana, or lightweight alternatives)
 - Alerting (Slack, Discord, Telegram webhook notifications)
 - Structured logging (JSON format, log rotation)

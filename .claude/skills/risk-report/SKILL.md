@@ -24,8 +24,8 @@ Using the **quant-analyst** subagent:
 - **Monte Carlo VaR**: Simulated portfolio paths (10,000+ scenarios)
 - **CVaR** (Expected Shortfall): Average loss beyond VaR
 
-Confidence levels: 95%, 99%
-Horizons: 1-day, 1-week, 1-month
+Confidence levels: Configurable (default: 95%, 99%)
+Horizons: Configurable (default: 1-day, 1-week, 1-month)
 
 ### Step 3: Stress Testing
 Simulate portfolio under extreme scenarios:

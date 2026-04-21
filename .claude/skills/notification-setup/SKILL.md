@@ -23,11 +23,11 @@ Configure which events trigger notifications:
 
 | Event | Severity | Example |
 |-------|----------|---------|
-| Trade entry/exit | INFO | "BUY 0.001 BTC @ 15,000,000 JPY" |
-| Daily PnL summary | INFO | "Daily PnL: +12,500 JPY (+0.83%)" |
-| Safety gate triggered | WARNING | "SFD gate activated (deviation: 5.2%)" |
+| Trade entry/exit | INFO | "BUY {amount} {symbol} @ {price}" |
+| Daily PnL summary | INFO | "Daily PnL: {amount} ({percent}%)" |
+| Safety gate triggered | WARNING | "Safety gate activated: {gate_name} ({details})" |
 | Connection lost | WARNING | "Exchange WebSocket disconnected" |
-| Emergency stop | CRITICAL | "Daily loss limit reached (-500 JPY)" |
+| Emergency stop | CRITICAL | "Daily loss limit reached ({amount})" |
 | Bot start/stop | INFO | "Bot started: tick_rsi v2.1" |
 | Position mismatch | CRITICAL | "Position reconciliation failed 3x" |
 

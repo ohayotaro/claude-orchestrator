@@ -4,12 +4,10 @@
 
 | Target | Precision | Example |
 |--------|-----------|---------|
-| Crypto prices | 8 decimal places | 0.00012345 BTC |
-| FX prices | 5 decimals (JPY: 3) | 1.12345, 150.123 |
-| Stock prices | 2 decimal places | 150.25 |
+| Prices | Follow exchange tick size for the instrument | Per exchange/instrument |
 | Performance metrics | 4 decimal places | Sharpe: 1.5432 |
 | Risk metrics | 2 decimals (%) | VaR: -2.35% |
-| Lot size | 2 decimal places | 0.01 lot |
+| Position size | Per exchange specification | Per exchange/instrument |
 
 ## Backtesting Principles
 

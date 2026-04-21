@@ -1,0 +1,27 @@
+{
+  "_comment": "Backtest warning thresholds. Customize per project. post-backtest-analysis.py falls back to built-in defaults if this file is missing.",
+  "sharpe": {
+    "pattern": "[Ss]harpe.*?(-?[\\d.]+)",
+    "threshold": 1.0,
+    "comparison": "below",
+    "message": "Sharpe Ratio below threshold"
+  },
+  "max_drawdown": {
+    "pattern": "[Mm]ax.*?[Dd]rawdown.*?(-?[\\d.]+)%?",
+    "threshold": 20.0,
+    "comparison": "above",
+    "message": "Max Drawdown exceeds threshold"
+  },
+  "win_rate": {
+    "pattern": "[Ww]in.*?[Rr]ate.*?([\\d.]+)%?",
+    "threshold": 40.0,
+    "comparison": "below",
+    "message": "Win Rate below threshold"
+  },
+  "profit_factor": {
+    "pattern": "[Pp]rofit.*?[Ff]actor.*?([\\d.]+)",
+    "threshold": 1.5,
+    "comparison": "below",
+    "message": "Profit Factor below threshold"
+  }
+}

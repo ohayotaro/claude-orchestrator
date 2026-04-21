@@ -1,8 +1,10 @@
 # Financial Trading AI Orchestrator
 
-Claude Code (Opus 4.6) をオーケストレーターとし、Codex CLI (GPT-5.4) と Gemini CLI (Gemini 2.5 Pro) を専門エージェントとして統合する金融トレーディングAIチーム。
+> **Reusable template** — clone and customize for any financial trading project.
 
-暗号資産・外為・先物市場のバックテスト解析、トレードロジック開発、EA (Expert Advisor) 開発、およびAPIベースの自動売買Bot開発・デプロイ・運用監視に対応。
+Claude Code (Opus 4.6) をオーケストレーターとし、Codex CLI (GPT-5.4) と Gemini CLI (Gemini 2.5 Pro) を専門エージェントとして統合する、**汎用**金融トレーディングAIチームテンプレート。
+
+バックテスト解析、トレードロジック開発、EA開発、APIベースの自動売買Bot開発・デプロイ・運用監視、ML/AIモデルパイプラインに対応。取引所・通貨・戦略に依存しない設計。
 
 ## Architecture
 

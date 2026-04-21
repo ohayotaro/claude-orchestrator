@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """PostToolUse hook (Bash): Detect backtest execution commands and suggest
 automatic result analysis and performance threshold checks.
+
+Thresholds are loaded from .claude/backtest-thresholds.json if present,
+otherwise built-in defaults are used.
 """
 
 import json
+import os
 import re
 import sys
 
@@ -12,12 +16,48 @@ BACKTEST_KEYWORDS = [
     "cerebro.run", "vbt.Portfolio", "bt.run",
 ]
 
-METRIC_PATTERNS = {
-    "sharpe": (r"[Ss]harpe.*?(-?[\d.]+)", 1.0, "Sharpe Ratio below 1.0"),
-    "max_dd": (r"[Mm]ax.*?[Dd]rawdown.*?(-?[\d.]+)%?", 20.0, "Max Drawdown exceeds 20%"),
-    "win_rate": (r"[Ww]in.*?[Rr]ate.*?([\d.]+)%?", 40.0, "Win Rate below 40%"),
-    "profit_factor": (r"[Pp]rofit.*?[Ff]actor.*?([\d.]+)", 1.5, "Profit Factor below 1.5"),
+# Built-in defaults
+DEFAULT_THRESHOLDS = {
+    "sharpe": {
+        "pattern": r"[Ss]harpe.*?(-?[\d.]+)",
+        "threshold": 1.0,
+        "comparison": "below",
+        "message": "Sharpe Ratio below threshold",
+    },
+    "max_drawdown": {
+        "pattern": r"[Mm]ax.*?[Dd]rawdown.*?(-?[\d.]+)%?",
+        "threshold": 20.0,
+        "comparison": "above",
+        "message": "Max Drawdown exceeds threshold",
+    },
+    "win_rate": {
+        "pattern": r"[Ww]in.*?[Rr]ate.*?([\d.]+)%?",
+        "threshold": 40.0,
+        "comparison": "below",
+        "message": "Win Rate below threshold",
+    },
+    "profit_factor": {
+        "pattern": r"[Pp]rofit.*?[Ff]actor.*?([\d.]+)",
+        "threshold": 1.5,
+        "comparison": "below",
+        "message": "Profit Factor below threshold",
+    },
 }
+
+
+def load_thresholds() -> dict:
+    """Load thresholds from project config, fall back to defaults."""
+    config_path = os.path.join(
+        os.environ.get("CLAUDE_PROJECT_DIR", "."),
+        ".claude", "backtest-thresholds.json",
+    )
+    try:
+        with open(config_path) as f:
+            config = json.load(f)
+        thresholds = {k: v for k, v in config.items() if not k.startswith("_") and v}
+        return thresholds if thresholds else DEFAULT_THRESHOLDS
+    except (FileNotFoundError, json.JSONDecodeError):
+        return DEFAULT_THRESHOLDS
 
 
 def main() -> None:
@@ -33,7 +73,6 @@ def main() -> None:
     tool_input = data.get("tool_input", {})
     command = tool_input.get("command", "")
 
-    # Check if this is a backtest command
     command_lower = command.lower()
     if not any(kw in command_lower for kw in BACKTEST_KEYWORDS):
         sys.exit(0)
@@ -41,22 +80,27 @@ def main() -> None:
     tool_output = data.get("tool_output", {})
     stdout = tool_output.get("stdout", "")
 
+    thresholds = load_thresholds()
     warnings: list[str] = []
 
-    # Check performance thresholds
-    for metric_name, (pattern, threshold, warning_msg) in METRIC_PATTERNS.items():
+    for metric_name, config in thresholds.items():
+        pattern = config.get("pattern", "")
+        threshold = config.get("threshold", 0)
+        comparison = config.get("comparison", "below")
+        message = config.get("message", f"{metric_name} threshold breached")
+
         match = re.search(pattern, stdout)
         if match:
             try:
                 value = float(match.group(1))
-                if metric_name == "sharpe" and value < threshold:
-                    warnings.append(f"WARNING: {warning_msg} (actual: {value:.4f})")
-                elif metric_name == "max_dd" and abs(value) > threshold:
-                    warnings.append(f"WARNING: {warning_msg} (actual: {abs(value):.2f}%)")
-                elif metric_name == "win_rate" and value < threshold:
-                    warnings.append(f"WARNING: {warning_msg} (actual: {value:.2f}%)")
-                elif metric_name == "profit_factor" and value < threshold:
-                    warnings.append(f"WARNING: {warning_msg} (actual: {value:.4f})")
+                breached = False
+                if comparison == "below" and value < threshold:
+                    breached = True
+                elif comparison == "above" and abs(value) > threshold:
+                    breached = True
+
+                if breached:
+                    warnings.append(f"WARNING: {message} (actual: {value:.4f}, threshold: {threshold})")
             except (ValueError, IndexError):
                 pass
 
