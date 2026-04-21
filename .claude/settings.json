@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/agent-router.py\"",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/agent-router.py\"",
             "timeout": 10
           }
         ]
@@ -43,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-codex-before-write.py\"",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-codex-before-write.py\"",
             "timeout": 5
           }
         ]
@@ -53,7 +53,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/suggest-gemini-research.py\"",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/suggest-gemini-research.py\"",
             "timeout": 5
           }
         ]
@@ -65,22 +65,22 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/error-to-codex.py\"",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/error-to-codex.py\"",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-backtest-analysis.py\"",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-backtest-analysis.py\"",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-bot-execution.py\"",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-bot-execution.py\"",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/log-cli-tools.py\"",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/log-cli-tools.py\"",
             "timeout": 5
           }
         ]
@@ -90,12 +90,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-implementation-review.py\"",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-implementation-review.py\"",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/lint-on-save.py\"",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/lint-on-save.py\"",
             "timeout": 10
           }
         ]
