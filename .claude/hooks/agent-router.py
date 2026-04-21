@@ -53,6 +53,14 @@ DEFAULT_ROUTING: dict[str, list[str]] = {
         "regime", "walk-forward", "purge",
         "hyperparameter", "ablation", "overfitting",
     ],
+    "codex-debugger": [
+        "debug", "error", "traceback", "exception", "fix",
+        "root cause", "stack trace", "failure", "crash",
+    ],
+    "general-purpose": [
+        "explore", "find", "search", "document", "explain",
+        "summarize", "list", "count", "structure",
+    ],
 }
 
 
