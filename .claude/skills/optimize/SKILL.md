@@ -51,9 +51,35 @@ Perform:
 - Prefer parameters near the center of profitable regions (not edges)
 - Document sensitivity analysis
 
-### Step 7: Generate Report
+### Step 7: Optuna Integration (Automated HPO)
+For large search spaces, use Optuna:
+```python
+import optuna
+
+study = optuna.create_study(
+    study_name="{strategy}_{timestamp}",
+    direction="maximize",  # maximize Sharpe
+    storage="sqlite:///reports/optuna.db",  # persistent storage
+    pruner=optuna.pruners.MedianPruner(n_warmup_steps=20),
+)
+study.optimize(objective, n_trials=200, show_progress_bar=True)
+```
+
+- Use TPE sampler (default) for efficient Bayesian search
+- Enable pruning to skip unpromising trials early
+- Store results in SQLite for cross-session persistence
+- Visualize: `optuna.visualization.plot_param_importances(study)`
+
+### Step 8: Ablation Analysis
+- Remove each component/parameter → measure impact on Sharpe
+- Identify load-bearing vs decorative parameters
+- Prefer minimal parameter sets (fewer params = less overfitting)
+
+### Step 9: Generate Report
 Save optimization results to `reports/`:
 - Parameter heatmaps
 - Walk-forward equity curves
 - Monte Carlo distribution charts
 - Final parameter set with confidence intervals
+- Optuna study summary (best trial, param importances)
+- Ablation results table

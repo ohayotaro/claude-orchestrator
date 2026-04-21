@@ -89,7 +89,17 @@ def main() -> None:
             "systemd", "kubernetes", "k8s", "vps", "cloud",
             "monitor", "alert", "grafana", "prometheus",
             "health check", "log", "ci/cd", "pipeline",
-            "デプロイ", "監視", "インフラ",
+            "dashboard", "fastapi", "notification", "discord",
+            "launchd", "plist",
+            "デプロイ", "監視", "インフラ", "ダッシュボード", "通知",
+        ],
+        "ml-engineer": [
+            "machine learning", "ml", "model", "train", "feature",
+            "hmm", "lightgbm", "xgboost", "cnn", "lstm",
+            "clustering", "kmeans", "gmm", "hdbscan", "som",
+            "regime", "classification", "walk-forward", "purge",
+            "optuna", "hyperparameter", "ablation", "overfitting",
+            "機械学習", "特徴量", "レジーム", "学習",
         ],
     }
 

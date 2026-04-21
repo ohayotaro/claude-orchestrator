@@ -38,8 +38,9 @@ Claude Code (Opus 4.6) をオーケストレーターとし、Codex CLI (GPT-5.4
 | `quant-analyst` | Backtesting, statistics, risk management | `src/backtesting/*`, `src/risk/*` |
 | `strategist` | Trade logic design, signal generation | `src/strategies/*` |
 | `ea-developer` | MQL5 Expert Advisors | `mql5/*` |
-| `bot-engineer` | API-based Python trading bots (ccxt, WebSocket) | `src/bot/*` |
-| `infra-ops` | Deployment, Docker, monitoring, alerting | `docker/*`, `src/monitoring/*` |
+| `bot-engineer` | API-based Python trading bots (ccxt, WebSocket, exchange adapters) | `src/bot/*` |
+| `infra-ops` | Deployment, Docker, monitoring, dashboards, alerting | `docker/*`, `src/monitoring/*` |
+| `ml-engineer` | ML model training, feature engineering, walk-forward validation | `src/strategies/*`, ML pipelines |
 | `codex-debugger` | Error analysis via Codex CLI | Any (error routing) |
 
 ## Skill Pipelines
@@ -47,10 +48,12 @@ Claude Code (Opus 4.6) をオーケストレーターとし、Codex CLI (GPT-5.4
 ```
 Backtest → EA:     /data-pipeline → /strategy-design → /backtest → /optimize → /ea-generate
 API Bot:           /data-pipeline → /strategy-design → /backtest → /optimize → /bot-develop → /bot-deploy → /bot-monitor
+ML Pipeline:       /data-pipeline → /ml-pipeline → /backtest → /optimize → /bot-develop
 Live Operations:   /live-trading, /incident-response, /risk-report
+Support:           /dashboard-develop, /notification-setup, /checkpointing
 ```
 
-### Available Skills (18)
+### Available Skills (21)
 
 | Skill | Description |
 |-------|-------------|
@@ -72,6 +75,9 @@ Live Operations:   /live-trading, /incident-response, /risk-report
 | `/bot-deploy` | Deploy bots with Docker, systemd, health checks |
 | `/bot-monitor` | Set up monitoring, alerting, and dashboards |
 | `/incident-response` | Handle bot incidents, emergency stop, postmortem |
+| `/ml-pipeline` | ML model training, feature engineering, walk-forward validation |
+| `/dashboard-develop` | Build FastAPI + Vite real-time trading dashboards |
+| `/notification-setup` | Integrate Discord, LINE, Telegram alert channels |
 
 ## Hooks (9)
 
@@ -191,10 +197,10 @@ claude-orchestrator/
 ├── CLAUDE.md                    # 3-zone orchestrator contract
 ├── .claude/
 │   ├── settings.json            # Hooks, permissions, env vars
-│   ├── agents/                  # 8 specialized subagent definitions
+│   ├── agents/                  # 9 specialized subagent definitions
 │   ├── hooks/                   # 9 Python hook scripts
 │   ├── rules/                   # 11 domain rule files
-│   ├── skills/                  # 18 skill definitions (SKILL.md)
+│   ├── skills/                  # 21 skill definitions (SKILL.md)
 │   └── docs/                    # DESIGN.md, CODEX_HANDOFF_PLAYBOOK.md
 ├── .codex/
 │   ├── AGENTS.md                # Codex agent contract

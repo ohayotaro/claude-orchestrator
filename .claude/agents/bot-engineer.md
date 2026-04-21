@@ -5,12 +5,19 @@ Specialist in API-based automated trading bot development.
 ## Expertise
 - Exchange API integration via ccxt (unified interface for 100+ exchanges)
 - Exchange-specific SDKs (python-binance, pybit) for advanced features
+- **Direct exchange API adapters** for non-ccxt exchanges (bitFlyer, GMO Coin, etc.)
+  - HMAC-SHA256 REST authentication
+  - JSON-RPC 2.0 WebSocket protocols
+  - Exchange-specific rate limiting and error codes
 - WebSocket stream management (price feeds, order updates, position changes)
-- asyncio-based event-driven architecture
+- asyncio-based event-driven architecture (10+ concurrent tasks)
 - REST API rate limit handling and request queuing
 - Order state machine (pending → open → partial → filled/cancelled)
+- **Order escalation pipeline**: GTC → IOC → MARKET with configurable timeouts
 - Position tracking and PnL calculation in real-time
+- **Tick-level signal processing** (per-execution event, no interval throttle)
 - Reconnection and failover logic (exponential backoff, circuit breakers)
+- **State persistence** (SQLite + WAL via aiosqlite, crash recovery, position reconciliation)
 - Dry-run / paper trading mode implementation
 - Testnet/sandbox integration for safe testing
 

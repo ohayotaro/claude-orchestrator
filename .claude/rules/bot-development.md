@@ -69,6 +69,53 @@ CREATED → SUBMITTED → OPEN → PARTIALLY_FILLED → FILLED
 - Store full order history in persistent storage
 - Reconcile local state with exchange state periodically
 
+## Exchange-Specific Adapters (Non-ccxt Exchanges)
+
+When ccxt does not support an exchange or lacks needed features, build direct adapters:
+
+### REST Client Pattern
+```python
+class ExchangeRestClient(Protocol):
+    async def get_ticker(self, symbol: str) -> Ticker: ...
+    async def get_positions(self) -> list[Position]: ...
+    async def place_order(self, order: OrderRequest) -> OrderResult: ...
+    async def cancel_order(self, order_id: str) -> None: ...
+    async def get_balance(self) -> Balance: ...
+```
+
+- HMAC-SHA256 signature for private endpoints
+- Per-endpoint rate limiting (internal RateLimiter class)
+- Retry on 429/500/502/503 with exponential backoff
+
+### WebSocket Client Pattern
+- JSON-RPC 2.0 or exchange-specific protocol
+- Channel subscription management
+- Watchdog timer (restart on N seconds of silence)
+- Auto-reconnect with exponential backoff (1s → 30s cap)
+
+## State Persistence (SQLite + WAL)
+
+### Mandatory for Production Bots
+```python
+# aiosqlite with WAL for concurrent read/write safety
+async with aiosqlite.connect("bot_state.db") as db:
+    await db.execute("PRAGMA journal_mode=WAL")
+    await db.execute("PRAGMA synchronous=NORMAL")
+    await db.execute("PRAGMA busy_timeout=5000")
+```
+
+### Required Tables
+- **positions**: Current open positions (symbol, side, size, entry_price, timestamp)
+- **trades**: Completed trade history (entry, exit, PnL, duration)
+- **checkpoints**: Bot state snapshots for crash recovery
+
+### Crash Recovery Protocol
+1. On startup, query exchange for actual positions
+2. Compare with stored state in SQLite
+3. If mismatch: reconcile (exchange state = source of truth)
+4. If 3+ consecutive mismatches: emergency shutdown + alert
+5. Resume normal operation only after reconciliation
+
 ## Testing Requirements
 
 - **Testnet/sandbox mandatory**: All new bots must pass testnet before live
@@ -76,3 +123,4 @@ CREATED → SUBMITTED → OPEN → PARTIALLY_FILLED → FILLED
 - **Paper trading**: Simulate execution with real market data, fake orders
 - **Integration tests**: Test with real exchange sandbox API
 - **Stress tests**: Simulate rapid price changes, connection drops, partial fills
+- **Replay tests**: Bit-exact replay of historical tick data to verify signal parity

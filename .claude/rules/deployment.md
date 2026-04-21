@@ -103,3 +103,60 @@ WantedBy=multi-user.target
 4. Start: `docker compose up -d`
 5. Verify health check passes
 6. Monitor for 15 minutes before confirming
+
+## macOS launchd Deployment
+
+For local/dev deployment on macOS (alternative to Docker):
+
+### plist Template
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "...">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.trading.{bot_name}</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/path/to/.venv/bin/python</string>
+        <string>-m</string>
+        <string>src.bot.main</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/path/to/project</string>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+    <key>StandardOutPath</key>
+    <string>/path/to/logs/stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/path/to/logs/stderr.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>DOTENV_PATH</key>
+        <string>/path/to/.env</string>
+    </dict>
+</dict>
+</plist>
+```
+
+### Service Management
+```bash
+# Load and start
+launchctl load ~/Library/LaunchAgents/com.trading.{bot_name}.plist
+
+# Stop and unload
+launchctl unload ~/Library/LaunchAgents/com.trading.{bot_name}.plist
+
+# Check status
+launchctl list | grep trading
+
+# View logs
+tail -f /path/to/logs/stdout.log
+```
+
+### Notes
+- KeepAlive: auto-restart on crash (respects ThrottleInterval)
+- KillSwitch (exit code 0): does NOT trigger restart (clean exit)
+- Use for development/single-machine setups; prefer Docker for production
