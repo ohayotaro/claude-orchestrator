@@ -52,8 +52,11 @@ Evaluate:
 5. Risk control completeness"
 ```
 
-### Step 5: Strategy File Generation
-Create strategy file in `src/strategies/`:
+### Step 5: Strategy Implementation
+
+**Assess scope**: If the strategy requires multiple independent modules (signal generator, risk module, data adapter), transition to `/team-implement` with the design from Step 3-4 as input.
+
+For single-module strategies, create strategy file in `src/strategies/`:
 - Inherit from base strategy class
 - Implement signal generation
 - Implement entry/exit logic

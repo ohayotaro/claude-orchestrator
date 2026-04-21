@@ -45,8 +45,26 @@ Using the **bot-engineer** subagent, design based on researched API spec:
 - Risk controller (pre-trade checks, position limits)
 - Configuration (environment variables, CLI args)
 
-### Step 4: Implement Core Components
-Create modules in `src/bot/`:
+### Step 4: Implementation
+
+**Assess scope**: Count the independent modules to implement from Step 3's architecture design.
+
+| Modules to implement | Action |
+|---------------------|--------|
+| 1-2 modules | Implement directly in this skill |
+| 3+ modules | **Transition to `/team-implement`** — assign each module to a specialist agent |
+
+**If transitioning to `/team-implement`**, pass the architecture from Step 3 as input:
+```
+Module assignments:
+- bot-engineer   → src/bot/executor.py (order execution, rate limiting)
+- bot-engineer   → src/bot/websocket_manager.py (streams, reconnection)
+- bot-engineer   → src/bot/position_tracker.py (PnL, reconciliation)
+- quant-analyst  → src/bot/risk_controller.py (pre-trade checks, limits)
+Interface contracts: {define function signatures between modules}
+```
+
+**If implementing directly** (1-2 modules), create in `src/bot/`:
 
 **executor.py** — Order execution engine:
 - Exchange connection management

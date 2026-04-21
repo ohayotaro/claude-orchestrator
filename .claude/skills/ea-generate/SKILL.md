@@ -25,7 +25,10 @@ Using the **ea-developer** subagent, design:
 - Magic number assignment
 
 ### Step 3: Implement Core Logic
-Generate MQL5 code in `mql5/experts/`:
+
+**Assess scope**: If the EA requires multiple include files (shared library, custom indicators, utility modules), transition to `/team-implement` with the design from Step 2 as input, assigning `ea-developer` to each MQL5 file.
+
+For single-file EAs, generate MQL5 code in `mql5/experts/`:
 - Signal generation matching Python logic exactly
 - CTrade order management (market orders, pending orders)
 - Position tracking with magic number filtering

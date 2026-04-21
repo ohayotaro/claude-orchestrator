@@ -39,6 +39,9 @@ Design walk-forward protocol:
 - Validate that train/test boundaries are clean
 
 ### Step 4: Model Selection and Training
+
+**Assess scope**: If implementing multiple independent model types (e.g., unsupervised regime detector + supervised signal model + ensemble layer), transition to `/team-implement` assigning each model to `ml-engineer` subagents working in parallel.
+
 Choose and train model(s):
 - **Unsupervised** (regime detection): Hidden Markov models, clustering, density-based methods
 - **Supervised** (action/direction): Gradient boosting, neural networks, time series classifiers
