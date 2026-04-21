@@ -31,7 +31,7 @@
 
 ### Design Review (interactive)
 ```bash
-codex --approval-mode suggest "Review this design: {context}"
+codex -a on-request "Review this design: {context}"
 ```
 
 ### Debugging (auto-fix)
@@ -41,12 +41,12 @@ codex --full-auto "Debug and fix: {error_context}"
 
 ### Algorithm Design (interactive)
 ```bash
-codex --approval-mode suggest "Design algorithm for: {specification}"
+codex -a on-request "Design algorithm for: {specification}"
 ```
 
 ### MQL5 Review (interactive)
 ```bash
-codex --approval-mode suggest "Review MQL5 EA: {code_context}"
+codex -a on-request "Review MQL5 EA: {code_context}"
 ```
 
 ## Response Requirements

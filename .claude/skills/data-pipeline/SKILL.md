@@ -117,7 +117,7 @@ Create data cleaning module:
 ### Step 8: Codex Review
 Delegate to Codex for implementation review:
 ```bash
-codex --approval-mode suggest "Review this data pipeline implementation:
+codex -a on-request "Review this data pipeline implementation:
 {code}
 
 Verify against API spec:

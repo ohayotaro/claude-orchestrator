@@ -17,7 +17,7 @@ Invoke with `/codex-system` followed by the task type.
 
 ### Design Review
 ```bash
-codex --approval-mode suggest "Review this design:
+codex -a on-request "Review this design:
 $ARGUMENTS
 
 Evaluate:
@@ -38,7 +38,7 @@ Identify root cause, propose fix, suggest regression test."
 
 ### Algorithm Design
 ```bash
-codex --approval-mode suggest "Design an algorithm for:
+codex -a on-request "Design an algorithm for:
 $ARGUMENTS
 
 Requirements:
@@ -50,7 +50,7 @@ Requirements:
 
 ### MQL5 Review
 ```bash
-codex --approval-mode suggest "Review this MQL5 code:
+codex -a on-request "Review this MQL5 code:
 $ARGUMENTS
 
 Check:
@@ -62,7 +62,7 @@ Check:
 
 ### Statistical Validation
 ```bash
-codex --approval-mode suggest "Statistically validate:
+codex -a on-request "Statistically validate:
 $ARGUMENTS
 
 Perform:
@@ -73,7 +73,7 @@ Perform:
 ```
 
 ## Notes
-- Use `--approval-mode suggest` for interactive review (default)
+- Use `-a on-request` for interactive review (default)
 - Use `--full-auto` for auto-fix tasks (debugging, simple fixes)
 - Always include relevant context (code, metrics, error messages)
 - See `.claude/docs/CODEX_HANDOFF_PLAYBOOK.md` for detailed templates

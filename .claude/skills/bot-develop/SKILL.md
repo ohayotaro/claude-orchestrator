@@ -80,7 +80,7 @@ Create modules in `src/bot/`:
 ### Step 7: Codex Review
 Delegate to Codex for async pattern and error handling review:
 ```bash
-codex --approval-mode suggest "Review this trading bot for:
+codex -a on-request "Review this trading bot for:
 1. asyncio correctness (no blocking calls, proper cancellation)
 2. Error handling (API errors, network failures, partial fills)
 3. State consistency (position tracking accuracy)

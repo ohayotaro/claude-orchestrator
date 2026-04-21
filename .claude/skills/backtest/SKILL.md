@@ -38,7 +38,7 @@ Calculate and report:
 ### Step 5: Statistical Validation via Codex
 Delegate to Codex CLI for rigorous validation:
 ```bash
-codex --approval-mode suggest "Validate backtest results:
+codex -a on-request "Validate backtest results:
 - Sharpe: {value}, Annual Return: {value}, Max DD: {value}
 - Calculate p-value (H0: Sharpe=0)
 - Bootstrap 95% CI for annual return

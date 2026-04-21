@@ -63,7 +63,7 @@ Generate systemd unit file for:
 
 ### Step 7: Codex Deployment Review
 ```bash
-codex --approval-mode suggest "Review this deployment configuration:
+codex -a on-request "Review this deployment configuration:
 {Dockerfile + docker-compose.yml + systemd unit}
 
 Check:

@@ -66,7 +66,7 @@ Volume trend increasing
 ### Step 5: Codex Valuation Review
 For top candidates, delegate deep analysis:
 ```bash
-codex --approval-mode suggest "Review this stock screening result:
+codex -a on-request "Review this stock screening result:
 {top_candidates_with_metrics}
 
 Evaluate:

@@ -29,7 +29,7 @@ Using data-engineer subagent, collect:
 ### Step 3: Financial Statement Analysis via Codex
 Delegate quantitative analysis to Codex:
 ```bash
-codex --approval-mode suggest "Analyze these financial statements as an equity investor:
+codex -a on-request "Analyze these financial statements as an equity investor:
 
 Company: {company}
 Data: {financial_data}

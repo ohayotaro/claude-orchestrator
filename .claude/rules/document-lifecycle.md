@@ -122,7 +122,7 @@ The orchestrator checks the following conditions on `/checkpointing` or session 
 
 ### 4. CODEX_HANDOFF_PLAYBOOK.md — Missing Templates
 
-**Condition**: A skill in `.claude/skills/` contains `codex --approval-mode` or `Bash(codex *)` in its SKILL.md, but no corresponding template section exists in CODEX_HANDOFF_PLAYBOOK.md.
+**Condition**: A skill in `.claude/skills/` contains `codex -a` or `codex --full-auto` or `Bash(codex *)` in its SKILL.md, but no corresponding template section exists in CODEX_HANDOFF_PLAYBOOK.md.
 
 **Problem**: Codex delegation happens via ad-hoc prompts instead of the vetted playbook templates, leading to inconsistent quality.
 

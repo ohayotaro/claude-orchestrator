@@ -106,7 +106,7 @@ Implement using the selected stack. Apply these principles regardless of technol
 
 ### Step 6: Codex Review (for complex dashboards)
 ```bash
-codex --approval-mode suggest "Review this dashboard implementation:
+codex -a on-request "Review this dashboard implementation:
 {code}
 
 Check:

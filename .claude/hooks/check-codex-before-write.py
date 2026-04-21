@@ -88,7 +88,7 @@ def main() -> None:
         "DESIGN CHECK: This edit involves design/architecture decisions.\n"
         f"Reasons: {'; '.join(reasons)}\n"
         "Consider consulting Codex CLI before proceeding:\n"
-        "`codex --approval-mode suggest \"Review this design change: {context}\"`"
+        "`codex -a on-request \"Review this design change: {context}\"`"
     )
 
     result = {

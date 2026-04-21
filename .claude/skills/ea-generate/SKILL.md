@@ -41,7 +41,7 @@ Generate MQL5 code in `mql5/experts/`:
 
 ### Step 5: Codex Code Review
 ```bash
-codex --approval-mode suggest "Review this MQL5 Expert Advisor:
+codex -a on-request "Review this MQL5 Expert Advisor:
 {ea_code}
 
 Check:

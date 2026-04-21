@@ -41,7 +41,7 @@ Integrate findings from both agents:
 ### Step 4: Codex Design Review
 Delegate to Codex for rigorous review:
 ```bash
-codex --approval-mode suggest "Review this trading strategy design:
+codex -a on-request "Review this trading strategy design:
 {strategy_specification}
 
 Evaluate:

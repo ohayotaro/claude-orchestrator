@@ -87,7 +87,7 @@ def main() -> None:
             f"REVIEW SUGGESTION: Significant changes detected in this session.\n"
             f"Files modified: {file_count}, Lines added: {total_lines}\n"
             f"Consider running a code review via Codex:\n"
-            "`codex --approval-mode suggest \"Review recent changes for quality and correctness\"`\n"
+            "`codex -a on-request \"Review recent changes for quality and correctness\"`\n"
             "Or use `/team-review` for a comprehensive parallel review."
         )
 

@@ -79,7 +79,7 @@ Calculate and report:
 ### Step 7: Overfitting Detection
 Delegate to Codex for rigorous assessment:
 ```bash
-codex --approval-mode suggest "Assess overfitting risk:
+codex -a on-request "Assess overfitting risk:
 - IS Sharpe: {is}, OOS Sharpe: {oos}
 - Parameter count: {n_params}, Data points: {n_data}
 - Feature count: {n_features}

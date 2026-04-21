@@ -45,7 +45,7 @@ Collect and deduplicate issues from all three reviewers:
 ### Step 4: Codex Final Judgment
 Send aggregated findings to Codex for holistic assessment:
 ```bash
-codex --approval-mode suggest "Final code review judgment:
+codex -a on-request "Final code review judgment:
 Changes: {file_list}
 Security findings: {security_issues}
 Quant findings: {quant_issues}
