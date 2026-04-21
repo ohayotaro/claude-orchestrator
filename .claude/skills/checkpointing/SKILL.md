@@ -60,3 +60,13 @@ Scan session history for patterns that should be extracted:
 
 ### Step 5: Update Zone C
 Append checkpoint summary to CLAUDE.md Zone C for cross-session persistence.
+If Zone C exceeds 50 lines, summarize older entries and trim.
+
+### Step 6: Document Staleness Check
+Review per `document-lifecycle.md` rules:
+- [ ] CLAUDE.md Zone C: >50 lines? → Summarize
+- [ ] DESIGN.md: Updated since last structural code change?
+- [ ] api_specs/: Any spec >6 months old? → Flag for re-research
+- [ ] CODEX_HANDOFF_PLAYBOOK.md: New skills added since last update? → Flag
+
+Report any stale documents to the user with recommended action.

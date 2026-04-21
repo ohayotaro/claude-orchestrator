@@ -119,7 +119,7 @@ Operations:    /live-trading, /incident-response, /risk-report
 | 24 | `/gemini-system` | AI直接 | Gemini CLI 直接呼び出しテンプレート | Gemini |
 | 25 | `/checkpointing` | 管理 | セッション状態スナップショット・復元 | — |
 
-## 5. Rules（11 ルール）
+## 5. Rules（12 ルール）
 
 `.claude/rules/` に定義されるドメインルール。全エージェントがこれらに従う。
 
@@ -134,6 +134,7 @@ Operations:    /live-trading, /incident-response, /risk-report
 | `bot-development.md` | Bot | ccxt 標準パターン、WebSocket 自動リコネクト、asyncio ベストプラクティス、レート制限遵守、注文状態遷移管理、Pluggable StateStore (SQLite WAL default)、取引所固有アダプターパターン、取引時間制御 |
 | `deployment.md` | Bot | Docker マルチステージビルド、非 root ユーザー、ヘルスチェック必須、環境変数シークレット管理、systemd/launchd サービス、CI/CD、ロールバック手順 |
 | `monitoring.md` | Bot | 構造化ログ (JSON) 必須、コアメトリクス定義 (uptime, PnL, latency, errors)、アラート閾値 (configurable)、通知チャネル (webhook)、ログローテーション |
+| `document-lifecycle.md` | 全体 | 全ドキュメントの更新トリガー・責任・陳腐化検出。CLAUDE.md Zone B/C, DESIGN.md, api_specs/, reports/ の管理ポリシー。`/checkpointing` で自動チェック |
 | `codex-delegation.md` | 委譲 | Codex 委譲パターン: 設計レビュー (suggest)、デバッグ (full-auto)、応答フォーマット (TL;DR → Analysis → Plan → Code → Validation → Risks) |
 | `gemini-delegation.md` | 委譲 | Gemini 委譲パターン: チャート分析、PDF 解析、リサーチ。出力: 構造化 Markdown + 確信度 (High/Medium/Low) |
 
