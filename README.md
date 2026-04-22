@@ -278,6 +278,7 @@ claude-orchestrator/
 │   └── utils/                       # ユーティリティ
 ├── mql5/                            # MQL5 Expert Advisors
 ├── docker/                          # Docker デプロイテンプレート
+├── scripts/                         # 検証・分析スクリプト（永続化必須）
 ├── tests/                           # テストスイート
 ├── data/                            # データ保存 (gitignored)
 ├── reports/                         # レポート出力

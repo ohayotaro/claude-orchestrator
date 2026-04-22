@@ -47,11 +47,27 @@ Compare the current work context with the latest checkpoint's "Active Work" sect
 
 Commit count is NOT a factor — a single commit can represent a complete task switch, while 20 commits may be incremental work on the same task.
 
-**When updating**: Overwrite the existing file's content but keep the same filename. Update the timestamp inside the document.
+**When updating**: Append a new `---` delimited section to the existing checkpoint file. Do NOT overwrite previous content — earlier entries contain decisions, findings, and validation results that must be preserved.
+
+```markdown
+---
+## Update: {timestamp}
+
+### Progress Since Last Entry
+- {what changed}
+
+### New Findings
+- {new validation results, decisions, discoveries}
+
+### Updated Next Steps
+- {revised plan}
+```
 
 **When creating new**: Write to `.claude/checkpoints/{YYYY-MM-DD}_{HH-MM}_{branch}.md`.
 
-**Always**: Maintain a symlink or copy at `.claude/checkpoints/latest.md` pointing to the most recent checkpoint.
+**Never delete or overwrite checkpoint content.** Checkpoints are an append-only log. If a checkpoint file grows too large (>200 lines), create a new checkpoint and add a `Supersedes: {previous_filename}` reference at the top — but keep the old file.
+
+**Always**: Maintain a copy at `.claude/checkpoints/latest.md` pointing to the most recent checkpoint.
 
 Checkpoint content:
 

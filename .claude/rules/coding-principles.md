@@ -39,6 +39,37 @@ When implementing any client that connects to an external API:
 
 This applies to: exchange APIs, broker APIs, notification services (Discord, LINE, Telegram), data providers, and any other external HTTP/WebSocket service.
 
+### Validation Scripts (Mandatory Persistence)
+Any code generated for validation, verification, or analysis purposes MUST be saved as a reusable script — not discarded after execution.
+
+**What counts as validation code:**
+- Data quality checks (schema validation, missing values, range checks)
+- Backtest result analysis (metric calculation, visualization)
+- Statistical tests (significance, bootstrap, permutation)
+- ML model evaluation (walk-forward, overfitting detection, ablation)
+- API response verification (compare spec vs actual)
+- Performance benchmarks (latency, throughput)
+
+**Where to save:**
+```
+scripts/
+├── validate_data_{source}.py      # Data pipeline validation
+├── analyze_backtest_{strategy}.py  # Backtest result analysis
+├── check_model_{model}.py         # ML model evaluation
+├── verify_api_{service}.py        # API response verification
+├── benchmark_{component}.py       # Performance benchmarks
+└── ...
+```
+
+**Rules:**
+- Script must be self-contained and re-runnable (`uv run python scripts/xxx.py`)
+- Include a docstring explaining what it validates and expected output
+- Accept parameters via CLI args or environment variables (not hardcoded paths/values)
+- Output results to stdout or `reports/` — not inline in a chat session only
+- When a validation reveals an issue, the script becomes a regression test — keep it
+
+**Anti-pattern:** Generating a one-off code block in conversation, executing it, reading the output, then never saving it. The next session cannot reproduce that validation.
+
 ### Dependencies
 - Package manager: **uv**
 - Dependencies managed in `pyproject.toml`
