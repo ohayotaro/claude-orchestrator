@@ -65,7 +65,7 @@ Commit count is NOT a factor — a single commit can represent a complete task s
 
 **When creating new**: Write to `.claude/checkpoints/{YYYY-MM-DD}_{HH-MM}_{branch}.md`.
 
-**Never delete or overwrite checkpoint content.** Checkpoints are an append-only log. If a checkpoint file grows too large (>200 lines), create a new checkpoint and add a `Supersedes: {previous_filename}` reference at the top — but keep the old file.
+**Never delete or overwrite checkpoint content.** Checkpoints are an append-only log. File splitting is determined by the task/context decision logic above — not by line count.
 
 **Always**: Maintain a copy at `.claude/checkpoints/latest.md` pointing to the most recent checkpoint.
 
