@@ -100,7 +100,7 @@ Generate a multi-panel backtest chart. All panels share the same time axis for a
 ### Step 6: Statistical Validation via Codex
 Delegate to Codex for rigorous validation:
 ```bash
-codex -a on-request "Validate backtest results:
+codex exec "Validate backtest results:
 - Sharpe: {value}, Annual Return: {value}, Max DD: {value}
 - Calculate p-value (H0: Sharpe=0)
 - Bootstrap 95% CI for annual return

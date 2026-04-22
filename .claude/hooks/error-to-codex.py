@@ -71,7 +71,7 @@ def main() -> None:
         f"```\n{error_snippet}\n```\n"
         "Consider delegating to the codex-debugger subagent for root cause analysis:\n"
         "Use agent type 'codex-debugger' or run:\n"
-        f'`codex --full-auto "Debug: {error_types} in command: {command}"`'
+        f'`codex exec --full-auto "Debug: {error_types} in command: {command}"`'
     )
 
     result = {

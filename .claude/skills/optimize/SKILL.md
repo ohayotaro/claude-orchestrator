@@ -29,7 +29,7 @@ Using the **quant-analyst** subagent:
 
 ### Step 4: Overfitting Detection via Codex
 ```bash
-codex -a on-request "Evaluate overfitting risk:
+codex exec "Evaluate overfitting risk:
 - IS Sharpe: {is_sharpe}, OOS Sharpe: {oos_sharpe}
 - Parameter count: {count}, Data points: {n}
 - IS/OOS performance gap: {gap}%

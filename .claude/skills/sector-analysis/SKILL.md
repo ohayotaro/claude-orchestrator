@@ -52,7 +52,7 @@ Methods:
 
 ### Step 6: Codex Review
 ```bash
-codex -a on-request "Review this sector rotation analysis:
+codex exec "Review this sector rotation analysis:
 {sector_rankings_and_signals}
 
 Evaluate:

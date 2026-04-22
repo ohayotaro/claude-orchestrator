@@ -62,7 +62,7 @@ Gather evidence and delegate to Codex:
 3. Review recent code changes: `git log --oneline -10`
 
 ```bash
-codex --full-auto "Analyze this trading bot incident:
+codex exec --full-auto "Analyze this trading bot incident:
 
 Error logs:
 {paste relevant logs}

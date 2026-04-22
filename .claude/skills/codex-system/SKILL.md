@@ -17,7 +17,7 @@ Invoke with `/codex-system` followed by the task type.
 
 ### Design Review
 ```bash
-codex -a on-request "Review this design:
+codex exec "Review this design:
 $ARGUMENTS
 
 Evaluate:
@@ -30,7 +30,7 @@ Evaluate:
 
 ### Debugging
 ```bash
-codex --full-auto "Debug and fix this error:
+codex exec --full-auto "Debug and fix this error:
 $ARGUMENTS
 
 Identify root cause, propose fix, suggest regression test."
@@ -38,7 +38,7 @@ Identify root cause, propose fix, suggest regression test."
 
 ### Algorithm Design
 ```bash
-codex -a on-request "Design an algorithm for:
+codex exec "Design an algorithm for:
 $ARGUMENTS
 
 Requirements:
@@ -50,7 +50,7 @@ Requirements:
 
 ### MQL5 Review
 ```bash
-codex -a on-request "Review this MQL5 code:
+codex exec "Review this MQL5 code:
 $ARGUMENTS
 
 Check:
@@ -62,7 +62,7 @@ Check:
 
 ### Statistical Validation
 ```bash
-codex -a on-request "Statistically validate:
+codex exec "Statistically validate:
 $ARGUMENTS
 
 Perform:
@@ -73,7 +73,7 @@ Perform:
 ```
 
 ## Notes
-- Use `-a on-request` for interactive review (default)
-- Use `--full-auto` for auto-fix tasks (debugging, simple fixes)
+- Use `codex exec "..."` for non-interactive execution (from Claude Code Bash tool)
+- Use `codex exec --full-auto "..."` for auto-fix tasks (debugging, sandboxed execution)
 - Always include relevant context (code, metrics, error messages)
 - See `.claude/docs/CODEX_HANDOFF_PLAYBOOK.md` for detailed templates

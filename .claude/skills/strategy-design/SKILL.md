@@ -69,7 +69,7 @@ Integrate findings from all three tracks:
 ### Step 4: Codex Design Review
 Delegate to Codex for rigorous review:
 ```bash
-codex -a on-request "Review this trading strategy design:
+codex exec "Review this trading strategy design:
 {strategy_specification}
 
 Evaluate:

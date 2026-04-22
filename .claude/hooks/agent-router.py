@@ -121,7 +121,7 @@ def main() -> None:
         suggestions.append(
             "ROUTING: This task may benefit from deep reasoning. "
             "Consider delegating to Codex CLI: "
-            '`codex -a on-request "{task}"`'
+            '`codex exec "{task}"`'
         )
 
     # --- Priority 3: Specialized subagent (config-driven) ---

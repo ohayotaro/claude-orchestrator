@@ -5,7 +5,7 @@ Templates for delegating tasks to Codex CLI.
 ## 1. Strategy Design Review
 
 ```bash
-codex -a on-request "
+codex exec "
 You are reviewing a trading strategy design for a financial trading system.
 
 ## Strategy
@@ -25,7 +25,7 @@ Provide your assessment with confidence levels (High/Medium/Low) for each item.
 ## 2. Backtest Statistical Validation
 
 ```bash
-codex -a on-request "
+codex exec "
 Validate the statistical significance of these backtest results:
 
 ## Results
@@ -45,7 +45,7 @@ Flag any signs of overfitting or look-ahead bias.
 ## 3. MQL5 EA Code Review
 
 ```bash
-codex -a on-request "
+codex exec "
 Review this MQL5 Expert Advisor code:
 
 ## Code
@@ -66,7 +66,7 @@ Provide specific line-by-line feedback.
 ## 4. Error Root Cause Analysis
 
 ```bash
-codex --full-auto "
+codex exec --full-auto "
 Analyze and fix this error in a financial trading system:
 
 ## Error
@@ -84,7 +84,7 @@ Identify root cause, propose fix, and suggest a regression test.
 ## 5. Algorithm Optimization
 
 ```bash
-codex -a on-request "
+codex exec "
 Optimize this trading algorithm for performance:
 
 ## Current Implementation
@@ -103,7 +103,7 @@ Propose optimizations with expected speedup estimates.
 ## 6. Risk Model Design
 
 ```bash
-codex -a on-request "
+codex exec "
 Design a risk management model for this trading system:
 
 ## Portfolio

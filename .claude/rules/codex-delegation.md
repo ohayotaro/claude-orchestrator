@@ -31,22 +31,22 @@
 
 ### Design Review (interactive)
 ```bash
-codex -a on-request "Review this design: {context}"
+codex exec "Review this design: {context}"
 ```
 
 ### Debugging (auto-fix)
 ```bash
-codex --full-auto "Debug and fix: {error_context}"
+codex exec --full-auto "Debug and fix: {error_context}"
 ```
 
 ### Algorithm Design (interactive)
 ```bash
-codex -a on-request "Design algorithm for: {specification}"
+codex exec "Design algorithm for: {specification}"
 ```
 
 ### MQL5 Review (interactive)
 ```bash
-codex -a on-request "Review MQL5 EA: {code_context}"
+codex exec "Review MQL5 EA: {code_context}"
 ```
 
 ## Response Requirements

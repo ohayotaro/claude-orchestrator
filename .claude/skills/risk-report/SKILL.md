@@ -43,7 +43,7 @@ Simulate portfolio under extreme scenarios:
 
 ### Step 5: Codex Model Validation
 ```bash
-codex -a on-request "Validate risk model:
+codex exec "Validate risk model:
 - VaR (95%, 1d): {value}
 - CVaR (95%, 1d): {value}
 - Max portfolio drawdown potential: {value}

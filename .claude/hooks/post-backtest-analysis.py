@@ -108,7 +108,7 @@ def main() -> None:
         "BACKTEST COMPLETED. Recommended next steps:",
         "1. Review performance metrics against risk-management.md thresholds",
         "2. Run statistical validation via Codex: "
-        '`codex -a on-request "Validate backtest results: {metrics}"`',
+        '`codex exec "Validate backtest results: {metrics}"`',
         "3. Check for look-ahead bias in strategy code",
         "4. Run Out-of-Sample test if not done",
     ]

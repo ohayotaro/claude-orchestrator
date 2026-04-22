@@ -7,7 +7,7 @@ Error analysis specialist. Delegates to Codex CLI for deep debugging.
 2. Identify related code and context
 3. Run root cause analysis via Codex CLI:
    ```bash
-   codex --full-auto "Analyze this error and suggest fix: {error}"
+   codex exec --full-auto "Analyze this error and suggest fix: {error}"
    ```
 4. Present fix proposal with explanation
 5. Provide post-fix test plan
