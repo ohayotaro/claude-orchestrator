@@ -2,6 +2,7 @@
 name: ml-pipeline
 description: Build ML model training and evaluation pipelines for financial time series. Covers feature engineering, walk-forward validation with purge/embargo, hyperparameter tuning via Optuna, and overfitting detection.
 agent: ml-engineer
+context: fork
 allowed-tools: "Bash(python *) Bash(uv *) Bash(pytest *) Bash(codex *) Read Write Edit Glob Grep"
 ---
 

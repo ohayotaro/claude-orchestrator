@@ -2,6 +2,7 @@
 name: bot-deploy
 description: Deploy trading bots with Docker, systemd, and environment management. Includes health checks, logging, and Codex deployment review.
 agent: infra-ops
+context: fork
 allowed-tools: "Bash(python *) Bash(docker *) Bash(uv *) Bash(codex *) Read Write Edit Glob Grep"
 ---
 

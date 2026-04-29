@@ -2,6 +2,7 @@
 name: bot-monitor
 description: Set up monitoring, alerting, and dashboards for trading bots. Covers structured logging, metrics, alert rules, and notification channels.
 agent: infra-ops
+context: fork
 allowed-tools: "Bash(python *) Bash(docker *) Bash(uv *) Read Write Edit Glob Grep"
 ---
 

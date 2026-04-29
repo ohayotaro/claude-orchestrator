@@ -2,6 +2,7 @@
 name: notification-setup
 description: Design the notification routing from bot log events to alert channels. Define which events trigger notifications, at what severity, in what format, and to which channel.
 agent: bot-engineer
+context: fork
 allowed-tools: "Bash(python *) Bash(uv *) Read Write Edit Glob Grep"
 ---
 

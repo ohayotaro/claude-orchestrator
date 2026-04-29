@@ -2,6 +2,7 @@
 name: data-pipeline
 description: Build and manage market data acquisition, normalization, and storage pipelines. Begins with mandatory API specification research before any implementation.
 agent: data-engineer
+context: fork
 allowed-tools: "Bash(python *) Bash(uv *) Bash(codex *) Bash(gemini *) Read Write Edit Glob Grep"
 ---
 

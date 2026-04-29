@@ -2,6 +2,7 @@
 name: bot-develop
 description: Develop API-based automated trading bots using ccxt, python-binance, and WebSocket. Covers architecture, order management, position tracking, and testnet verification.
 agent: bot-engineer
+context: fork
 allowed-tools: "Bash(python *) Bash(uv *) Bash(pytest *) Bash(codex *) Read Write Edit Glob Grep"
 ---
 

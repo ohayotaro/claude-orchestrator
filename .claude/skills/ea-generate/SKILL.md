@@ -2,6 +2,7 @@
 name: ea-generate
 description: Convert Python trading strategies to MQL5 Expert Advisors with Codex code review, order management, and risk controls.
 agent: ea-developer
+context: fork
 allowed-tools: "Bash(python *) Bash(codex *) Read Write Edit Glob Grep"
 ---
 
