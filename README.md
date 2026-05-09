@@ -155,28 +155,22 @@ See `.claude/docs/DESIGN.md` for the full architecture, routing policy, and rati
 
 ## Updating the template
 
-There is no auto-update script in this repo. To pull the latest template into a project that already uses it, back up Zone B and your customized config, overwrite, then restore:
+Run `scripts/update.sh` from your project root to refresh the template. It backs up Zone B and customizable JSON, pulls the latest, then restores the backups.
 
 ```bash
 cd /path/to/your-trading-project
-
-# 1. Back up project-specific config
-sed -n '/@orchestra:template-boundary/,/@orchestra:repo-boundary/p' CLAUDE.md > .zone-b-backup.md
-cp .claude/routing-keywords.json    .routing-keywords-backup.json    2>/dev/null
-cp .claude/backtest-thresholds.json .backtest-thresholds-backup.json 2>/dev/null
-
-# 2. Pull latest template
-git clone --depth 1 https://github.com/ohayotaro/claude-finance.git .starter \
-  && cp -r .starter/.claude .starter/.codex .starter/.gemini .starter/CLAUDE.md . \
-  && rm -rf .starter
-
-# 3. Restore customized config
-mv .routing-keywords-backup.json    .claude/routing-keywords.json    2>/dev/null
-mv .backtest-thresholds-backup.json .claude/backtest-thresholds.json 2>/dev/null
-# Manually re-paste .zone-b-backup.md content into CLAUDE.md between @orchestra:template-boundary and @orchestra:repo-boundary, then rm .zone-b-backup.md
+bash <(curl -fsSL https://raw.githubusercontent.com/ohayotaro/claude-finance/main/scripts/update.sh)
 ```
 
-Updated: `.claude/` agents / hooks / rules / skills / settings, `.codex/`, `.gemini/`, `CLAUDE.md` Zone A. Untouched: project code (`src/`, `mql5/`, `tests/`), `pyproject.toml`, `README.md`.
+Or, if `scripts/update.sh` is already in your tree:
+
+```bash
+./scripts/update.sh
+```
+
+Preserved: `CLAUDE.md` Zone B, `.claude/routing-keywords.json`, `.claude/backtest-thresholds.json`, `.claude/settings.local.json`.
+
+Overwritten: `.claude/` agents / hooks / rules / skills / settings.json, `.codex/`, `.gemini/`, `CLAUDE.md` Zone A. Untouched: project code (`src/`, `mql5/`, `tests/`), `pyproject.toml`, `README.md`.
 
 ## Architecture
 
