@@ -71,9 +71,11 @@ This file is managed by Claude Code's auto memory system. Project-specific guida
 
 **Staleness check**: Before implementing against an existing api_spec, verify the documented API version matches the current version. If >6 months old, re-research.
 
-## Automatic Update Points
+## Update Points (manual)
 
-These events SHOULD trigger document updates (enforced by skill workflows and orchestrator awareness):
+> **Honest scope**: There is no hook that automatically writes to CLAUDE.md, DESIGN.md, CODEX_HANDOFF_PLAYBOOK.md, or `incidents/` when these events fire. Enforcement is by orchestrator discipline, reinforced by `/checkpointing` Step 7 (Drift Detection). The list below is a contract Claude follows, not an automation guarantee — if a skill below completes without the corresponding update, that is a drift.
+
+These events SHOULD trigger document updates (manually, by the orchestrator running the skill):
 
 ```
 /init-finance          → CLAUDE.md Zone B (create)

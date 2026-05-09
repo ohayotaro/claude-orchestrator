@@ -29,25 +29,25 @@
 
 ## Command Templates
 
-### Design Review (interactive)
-```bash
-codex exec "Review this design: {context}"
-```
+**Canonical location**: `.claude/docs/CODEX_HANDOFF_PLAYBOOK.md`. All Codex prompt templates live there with their full structured form. Reference by section number when invoking — do not copy template bodies into skills or rules (avoids drift).
 
-### Debugging (auto-fix)
-```bash
-codex exec --full-auto "Debug and fix: {error_context}"
-```
+| Use case | Playbook section |
+|---|---|
+| Strategy design review | §1 Strategy Design Review |
+| Backtest statistical validation | §2 Backtest Statistical Validation |
+| MQL5 EA code review | §3 MQL5 EA Code Review |
+| Error root cause analysis (auto-fix) | §4 Error Root Cause Analysis |
+| Algorithm / performance optimization | §5 Algorithm Optimization |
+| Risk model design | §6 Risk Model Design |
+| Team-review final judgment | §7 Team Review — Final Judgment |
+| Incident postmortem | §8 Incident Root Cause Analysis |
+| IR analysis synthesis | §9 IR Analysis Synthesis |
+| Equity screener validation | §10 Equity Screener Criteria Validation |
+| Sector rotation review | §11 Sector Rotation Logic Review |
+| Optimization result validation | §12 Optimization Result Validation |
+| ML pipeline validation | §13 ML Pipeline Validation |
 
-### Algorithm Design (interactive)
-```bash
-codex exec "Design algorithm for: {specification}"
-```
-
-### MQL5 Review (interactive)
-```bash
-codex exec "Review MQL5 EA: {code_context}"
-```
+For one-off consultations that do not match any section, use `/codex-system` skill (it wraps `codex exec` with the standard invocation flags).
 
 ## Failure Handling
 

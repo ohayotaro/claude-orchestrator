@@ -11,9 +11,13 @@ import os
 import re
 import sys
 
+# Match actual backtest invocations, not any string containing "backtest".
+# These are concrete command fragments that indicate a real run.
 BACKTEST_KEYWORDS = [
-    "backtest", "backtrader", "vectorbt", "run_backtest",
+    "backtrader", "vectorbt", "run_backtest",
     "cerebro.run", "vbt.Portfolio", "bt.run",
+    "python -m backtest", "uv run backtest",
+    "pytest -m backtest", "pytest -k backtest",
 ]
 
 # Built-in defaults
@@ -103,6 +107,16 @@ def main() -> None:
         return
 
     thresholds = load_thresholds()
+
+    # Gate: only proceed if stdout actually contains backtest-style metric output.
+    # Without this, a `git commit` whose message mentions a backtest framework
+    # would falsely fire the completion suggestion.
+    if not any(
+        re.search(cfg.get("pattern", ""), stdout)
+        for cfg in thresholds.values()
+    ):
+        sys.exit(0)
+
     warnings: list[str] = []
 
     for metric_name, config in thresholds.items():
