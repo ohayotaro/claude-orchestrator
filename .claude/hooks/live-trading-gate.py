@@ -20,6 +20,8 @@ Exit codes:
   2 = block (Claude Code surfaces stderr to the model)
 """
 
+from __future__ import annotations
+
 import json
 import os
 import re
