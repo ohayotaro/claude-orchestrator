@@ -27,9 +27,10 @@ htmlcov/
 # uv
 .venv/
 
-# Claude Code logs
+# Claude Code logs and local state
 .claude/logs/
 .claude/checkpoints/
+.claude/state/
 .claude/settings.local.json
 
 # IDE
