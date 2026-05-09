@@ -108,15 +108,18 @@ Scan session history for patterns that should be extracted:
 Append checkpoint summary to CLAUDE.md Zone C for cross-session persistence.
 If Zone C exceeds 50 lines, summarize older entries and trim.
 
-### Step 6: Checkpoint Commit
-Create a git commit to preserve the checkpoint state. This is separate from feature commits.
+### Step 6: Persist Orchestrator State
+
+Checkpoint files in `.claude/checkpoints/` are **local-only** — `.gitignore` excludes that directory. They are session-recovery artifacts, not shared history.
+
+What IS committed by this step is the durable orchestrator state that lives outside `.claude/checkpoints/`:
 
 ```bash
-git add CLAUDE.md .claude/checkpoints/ .claude/docs/ reports/
-# Use "update" or "create" based on Step 3 decision:
-git commit -m "chore(checkpoint): {update|create} {checkpoint_filename}
+# Stage only the durable orchestrator state files (NOT the checkpoint file itself)
+git add CLAUDE.md .claude/docs/ reports/
+git commit -m "chore(checkpoint): sync orchestrator state ({timestamp})
 
-Checkpoint includes:
+Includes:
 - Zone C context update
 - {summary of drift detection results, if any}
 - {summary of document updates, if any}
@@ -125,10 +128,11 @@ Checkpoint includes:
 ```
 
 Rules:
-- **Only commit orchestrator state files** (CLAUDE.md, checkpoints/, docs/, reports/). Do NOT commit uncommitted source code — that is the user's responsibility.
+- **Checkpoint files are local-only.** They are kept under `.claude/checkpoints/` for session recovery and handoff on the same machine; they are not committed to git.
+- **Only commit orchestrator state files** (CLAUDE.md Zone C, .claude/docs/, reports/). Do NOT commit uncommitted source code — that is the user's responsibility.
 - **Use `chore(checkpoint):` prefix** to distinguish from feature/fix commits in git log.
 - **Ask the user before committing** if there are staged source code changes that might be unintentionally included. Run `git status` first.
-- If the user declines the commit, the checkpoint file is still saved locally but not in git history.
+- If the user declines the commit, Zone C and the local checkpoint file are still saved on disk.
 
 ### Step 7: Document Drift Detection
 Run each check defined in `document-lifecycle.md` "Drift Detection" section:

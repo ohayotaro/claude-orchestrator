@@ -1,7 +1,7 @@
 ---
 name: dashboard-develop
 description: Build dashboards and visualization UIs for trading bots, backtest results, portfolio analytics, or research reports. Technology stack is selected based on use case.
-allowed-tools: "Bash(python *) Bash(uv *) Bash(npm *) Bash(npx *) Bash(codex *) Read Write Edit Glob Grep"
+allowed-tools: "Bash(python *) Bash(uv *) Bash(codex *) Read Write Edit Glob Grep"
 ---
 
 # Dashboard & Visualization Development
@@ -26,17 +26,19 @@ Ask the user:
 
 Choose stack based on use case. Do NOT default to a single stack — evaluate trade-offs:
 
+This orchestrator is Python-only — JS toolchains (npm/npx/Vite) are out of scope.
+
 | Use Case | Recommended Stack | Rationale |
 |----------|------------------|-----------|
-| Live bot monitoring | FastAPI + Vite SPA | Low latency, WebSocket support, customizable |
+| Live bot monitoring | FastAPI + Server-Sent Events / WebSocket, render with Jinja2 + HTMX | Low latency, WebSocket support, no JS build step |
 | Quick backtest viewer | Streamlit or Jupyter + Plotly | Rapid prototyping, interactive, Python-native |
 | Portfolio dashboard | Streamlit or Dash | Data-heavy tables, charts from DataFrame |
 | Research report viewer | Static HTML generation (Jinja2) | No server needed, easy to share/archive |
-| Production team dashboard | FastAPI + Vite or Grafana | Robust, multi-user, alerting integration |
+| Production team dashboard | Dash, Streamlit, or Grafana | Robust, multi-user, alerting integration |
 
 **Charting libraries** (select per need):
-- **Plotly**: Interactive, wide chart types, Python + JS
-- **Lightweight Charts** (TradingView): Candlestick-native, lightweight, JS only
+- **Plotly**: Interactive, wide chart types, Python-native API
+- **Bokeh**: Interactive, server-rendered, good for streaming data
 - **Matplotlib**: Static export (PNG/PDF), publication-quality
 - **Altair/Vega**: Declarative, good for statistical charts
 
@@ -109,7 +111,7 @@ Implement using the selected stack. Apply these principles regardless of technol
 | Method | When to use |
 |--------|------------|
 | `uv run streamlit run app.py` | Local development, quick prototyping |
-| `npm run build` → static hosting | Report viewers, no backend needed |
+| `uv run python scripts/render_report.py` → static hosting | Report viewers, no backend needed |
 | Docker service in `docker-compose.yml` | Production bot monitoring |
-| Cron + static HTML generation | Periodic reports, no running server |
-| `uv run uvicorn app:app` | API-backed dashboards |
+| Cron + static HTML generation (Jinja2) | Periodic reports, no running server |
+| `uv run uvicorn app:app` | API-backed dashboards (FastAPI + HTMX/Jinja2) |

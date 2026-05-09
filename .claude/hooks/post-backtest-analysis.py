@@ -79,6 +79,28 @@ def main() -> None:
 
     tool_output = data.get("tool_output", {})
     stdout = tool_output.get("stdout", "")
+    stderr = tool_output.get("stderr", "")
+    exit_code = tool_output.get("exit_code", 0)
+
+    # If the backtest command failed, do NOT report completion.
+    if exit_code != 0:
+        failure_context_parts = [
+            f"BACKTEST FAILED (exit_code={exit_code}). Recommended next steps:",
+            "1. Inspect stderr/traceback before any further action.",
+            "2. Delegate root-cause analysis: "
+            "`codex exec --full-auto \"Debug backtest failure: {error}\"`",
+            "3. Do NOT proceed with strategy validation until the failure is resolved.",
+        ]
+        if stderr:
+            failure_context_parts.append(f"\nstderr (first 500 chars):\n{stderr[:500]}")
+        result = {
+            "hookSpecificOutput": {
+                "hookEventName": "PostToolUse",
+                "additionalContext": "\n".join(failure_context_parts),
+            }
+        }
+        json.dump(result, sys.stdout)
+        return
 
     thresholds = load_thresholds()
     warnings: list[str] = []

@@ -1,7 +1,7 @@
 ---
 name: team-implement
 description: Parallel implementation using Agent Teams. Each team member works on independent file sets to avoid conflicts.
-allowed-tools: "Bash(python *) Bash(uv *) Bash(pytest *) Read Write Edit Glob Grep"
+allowed-tools: "Bash(python *) Bash(uv *) Bash(pytest *) Bash(mypy *) Bash(ruff *) Read Write Edit Glob Grep"
 ---
 
 # Team Parallel Implementation
@@ -24,6 +24,9 @@ Break the implementation into independent modules:
 | quant-analyst | `src/backtesting/*`, `src/risk/*` | Backtest engine, risk calculations |
 | strategist | `src/strategies/*` | Strategy logic, signals |
 | ea-developer | `mql5/*` | Expert Advisors, MQL5 code |
+| bot-engineer | `src/bot/*` | API-based bot engine (executor, position tracker, WebSocket) |
+| infra-ops | `docker/*`, `src/monitoring/*`, deploy configs | Containerization, deployment, monitoring, alerting |
+| ml-engineer | `src/ml/*`, ML feature/eval scripts | ML model training, feature engineering, walk-forward validation |
 | general-purpose | `src/utils/*`, `tests/*` | Utilities, test code |
 
 ### Step 3: Parallel Execution

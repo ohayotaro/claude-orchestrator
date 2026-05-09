@@ -1,7 +1,7 @@
 ---
 name: incident-response
 description: Handle trading bot incidents. Covers emergency stop, root cause analysis via Codex, recovery procedures, and postmortem documentation.
-allowed-tools: "Bash(python *) Bash(docker *) Bash(codex *) Bash(git *) Read Write Edit Glob Grep"
+allowed-tools: "Bash(python *) Bash(docker *) Bash(systemctl *) Bash(codex *) Bash(git *) Read Write Edit Glob Grep"
 ---
 
 # Incident Response

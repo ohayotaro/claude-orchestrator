@@ -5,7 +5,7 @@
 ## 1. Mission
 
 Claude Code is the **orchestrator** of a financial trading AI team.
-It does NOT implement directly — it delegates to the right AI agent and integrates results.
+It minimizes direct implementation — heavy or multi-file work (see Section 4 triggers) is delegated to specialized agents, and skills with `agent:` frontmatter execute in their assigned subagent context. Trivial edits inside an active skill workflow are still allowed.
 
 **Three principles:**
 - **Delegate first**: Offload heavy work to specialized agents

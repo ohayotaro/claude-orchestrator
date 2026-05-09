@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 """UserPromptSubmit hook: Analyze user prompt and suggest optimal AI routing.
 
-Priority:
+Selects ONE primary route, with at most ONE fallback when a different category
+also matches strongly. This keeps suggestions actionable instead of dumping
+every keyword match.
+
+Priority order (used as tiebreaker):
   1. Gemini — multimodal file references (images, PDFs)
   2. Codex  — design, debug, optimization, algorithm keywords
   3. Specialized subagent — configurable domain keywords
+
+Within a category, the candidate with the most matched keywords wins.
+A fallback is only emitted if it comes from a different category than the
+primary AND has at least one keyword match.
 
 Keywords are loaded from .claude/routing-keywords.json if present,
 otherwise built-in defaults are used.
@@ -56,6 +64,7 @@ DEFAULT_ROUTING: dict[str, list[str]] = {
     "codex-debugger": [
         "debug", "error", "traceback", "exception", "fix",
         "root cause", "stack trace", "failure", "crash",
+        "bug", "failing test", "regression",
     ],
     "general-purpose": [
         "explore", "find", "search", "document", "explain",
@@ -95,7 +104,11 @@ def main() -> None:
         sys.exit(0)
 
     prompt_lower = prompt.lower()
-    suggestions: list[str] = []
+
+    # Each candidate: (priority, score, category, message)
+    # priority: lower number = higher priority category
+    # score: number of matched keywords (used to break ties within priority)
+    candidates: list[tuple[int, int, str, str]] = []
 
     # --- Priority 1: Gemini (multimodal) ---
     multimodal_patterns = [
@@ -103,38 +116,61 @@ def main() -> None:
         r"\.(pdf|doc|docx|xls|xlsx)",
         r"chart|image|screenshot|diagram|picture",
     ]
-    for pattern in multimodal_patterns:
-        if re.search(pattern, prompt_lower):
-            suggestions.append(
-                "ROUTING: This task involves multimodal input. "
-                "Consider delegating to Gemini CLI: "
-                '`gemini -p "{prompt}" -f {file}`'
-            )
-            break
+    multimodal_hits = sum(
+        1 for pattern in multimodal_patterns if re.search(pattern, prompt_lower)
+    )
+    if multimodal_hits > 0:
+        candidates.append((
+            1, multimodal_hits, "gemini",
+            "ROUTING: This task involves multimodal input. "
+            "Consider delegating to Gemini CLI: "
+            '`gemini -p "{prompt}" -f {file}`',
+        ))
 
     # --- Priority 2: Codex (deep reasoning) ---
     codex_keywords = [
         "design", "architect", "debug", "error", "traceback",
         "optimize", "algorithm", "review", "refactor",
+        "bug", "failing test", "regression",
     ]
-    if any(kw in prompt_lower for kw in codex_keywords):
-        suggestions.append(
+    codex_hits = sum(1 for kw in codex_keywords if kw in prompt_lower)
+    if codex_hits > 0:
+        candidates.append((
+            2, codex_hits, "codex",
             "ROUTING: This task may benefit from deep reasoning. "
             "Consider delegating to Codex CLI: "
-            '`codex exec "{task}"`'
-        )
+            '`codex exec "{task}"`',
+        ))
 
     # --- Priority 3: Specialized subagent (config-driven) ---
+    # Pick the single subagent with the highest keyword match count.
     agent_routing = load_routing_config()
-
+    best_agent: str | None = None
+    best_agent_hits = 0
     for agent, keywords in agent_routing.items():
-        if any(kw in prompt_lower for kw in keywords):
-            suggestions.append(
-                f"ROUTING: Consider using the '{agent}' subagent for this task."
-            )
+        hits = sum(1 for kw in keywords if kw in prompt_lower)
+        if hits > best_agent_hits:
+            best_agent = agent
+            best_agent_hits = hits
+    if best_agent is not None:
+        candidates.append((
+            3, best_agent_hits, "subagent",
+            f"ROUTING: Consider using the '{best_agent}' subagent for this task.",
+        ))
 
-    if not suggestions:
+    if not candidates:
         sys.exit(0)
+
+    # Sort: higher-priority category first, then more keyword matches first.
+    candidates.sort(key=lambda c: (c[0], -c[1]))
+
+    suggestions: list[str] = [candidates[0][3]]
+    # Optional fallback: only if from a different category.
+    primary_category = candidates[0][2]
+    for cand in candidates[1:]:
+        if cand[2] != primary_category:
+            suggestions.append("ROUTING (fallback): " + cand[3].split("ROUTING: ", 1)[-1])
+            break
 
     result = {
         "hookSpecificOutput": {

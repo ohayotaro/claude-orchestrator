@@ -41,7 +41,7 @@ reports/           → .gitkeep
 ```
 
 ### Step 4: Generate .gitignore
-Include: `data/`, `.env`, `*.pyc`, `__pycache__/`, `.claude/logs/`, `reports/*.html`, `uv.lock`
+Include: `data/`, `.env`, `*.pyc`, `__pycache__/`, `.claude/logs/`, `reports/*.html`. Do NOT ignore `uv.lock` — it must be committed for reproducible builds (see `coding-principles.md`).
 
 ### Step 5: Generate .env.example
 Template with all required API key placeholders.

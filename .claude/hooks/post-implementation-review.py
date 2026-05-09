@@ -60,9 +60,22 @@ def main() -> None:
     if not file_path:
         sys.exit(0)
 
-    # Count new lines added
-    content = tool_input.get("new_string", "") or tool_input.get("content", "")
-    new_lines = count_meaningful_lines(content)
+    # Count net additions, not full replacement size.
+    # Edit tool: count lines added in new_string minus lines removed in old_string.
+    # Write tool: count full content (whole-file write).
+    new_string = tool_input.get("new_string", "")
+    old_string = tool_input.get("old_string", "")
+    write_content = tool_input.get("content", "")
+
+    if new_string or old_string:
+        new_lines = max(
+            0,
+            count_meaningful_lines(new_string) - count_meaningful_lines(old_string),
+        )
+    elif write_content:
+        new_lines = count_meaningful_lines(write_content)
+    else:
+        sys.exit(0)
 
     state = load_state()
 

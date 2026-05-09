@@ -2,7 +2,7 @@
 name: backtest
 description: Execute trading strategy backtests with performance metrics, statistical validation via Codex, and optional Gemini chart interpretation.
 agent: quant-analyst
-allowed-tools: "Bash(python *) Bash(pytest *) Bash(codex *) Read Write Edit Glob Grep"
+allowed-tools: "Bash(python *) Bash(pytest *) Bash(codex *) Bash(gemini *) Read Write Edit Glob Grep"
 ---
 
 # Backtest Execution

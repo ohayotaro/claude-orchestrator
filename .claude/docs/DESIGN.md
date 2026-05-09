@@ -24,11 +24,15 @@ This project is an AI-orchestrated financial trading system that coordinates thr
 
 | Agent | Domain | File Scope |
 |-------|--------|------------|
-| data-engineer | Data pipelines | src/data/* |
+| data-engineer | Market data pipelines | src/data/* |
 | quant-analyst | Backtesting, statistics, risk | src/backtesting/*, src/risk/* |
 | strategist | Trade logic, signals | src/strategies/* |
-| ea-developer | MQL5 EA, Python bots | mql5/* |
-| codex-debugger | Error analysis | (any — via Codex CLI) |
+| ea-developer | MQL5 Expert Advisors | mql5/* |
+| bot-engineer | API-based Python trading bots (ccxt, WebSocket) | src/bot/* |
+| infra-ops | Deployment, Docker, monitoring, dashboards | docker/*, deploy configs, src/monitoring/* |
+| ml-engineer | ML model pipelines, feature engineering | src/ml/* (when present) |
+| codex-debugger | Error analysis via Codex | (any — via Codex CLI) |
+| general-purpose | Codebase exploration, utilities, tests | src/utils/*, tests/* |
 
 ## Skill Pipeline
 
