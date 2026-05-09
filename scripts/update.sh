@@ -16,22 +16,28 @@
 #   2. Backs up customizable JSON: routing-keywords.json,
 #      backtest-thresholds.json
 #   3. Clones the latest template into .starter-update/
-#   4. Overwrites .claude/, .codex/, .gemini/, CLAUDE.md
+#   4. Replaces ONLY template-managed paths (see lists below)
 #   5. Restores Zone B and custom JSON from the backup
 #   6. Cleans up
 #
-# What is preserved:
-#   - CLAUDE.md Zone B (your project-specific identity / commands / pipelines)
-#   - .claude/routing-keywords.json (if customized)
-#   - .claude/backtest-thresholds.json (if customized)
-#   - .claude/settings.local.json (per-machine, gitignored — never touched)
+# What is preserved (NEVER touched by this script):
+#   - .claude/projects/        — project memory (auto-memory)
+#   - .claude/checkpoints/     — /checkpointing session state
+#   - .claude/plans/           — Plan-mode output and user notes
+#   - .claude/logs/            — agent team logs
+#   - .claude/tmp/             — transient review artifacts
+#   - .claude/settings.local.json — per-machine overrides
+#   - any other file/dir under .claude/ not listed in TEMPLATE_PATHS below
+#   - CLAUDE.md Zone B (backed up and restored)
+#   - .claude/routing-keywords.json    (backed up and restored)
+#   - .claude/backtest-thresholds.json (backed up and restored)
 #
 # What is overwritten:
 #   - CLAUDE.md Zone A (template orchestration policy)
 #   - .claude/agents/, .claude/hooks/, .claude/rules/, .claude/skills/
+#   - .claude/docs/ (CODEX_HANDOFF_PLAYBOOK.md and similar template docs)
 #   - .claude/settings.json (re-add custom permissions afterward if needed;
 #     prefer .claude/settings.local.json for per-machine overrides)
-#   - .claude/docs/CODEX_HANDOFF_PLAYBOOK.md and similar template docs
 #   - .codex/, .gemini/
 #
 # Anything in your project tree (src/, mql5/, tests/, data/, reports/,
@@ -88,10 +94,28 @@ yellow "Cloning latest template into $TMP_DIR/"
 rm -rf "$TMP_DIR"
 git clone --depth 1 "$REPO_URL" "$TMP_DIR"
 
-# 5. Overwrite the four targets
-yellow "Overwriting .claude/, .codex/, .gemini/, CLAUDE.md"
-rm -rf .claude .codex .gemini CLAUDE.md
-cp -R "$TMP_DIR/.claude" .claude
+# 5. Overwrite ONLY template-managed paths inside .claude/.
+#    User/project state (projects/, checkpoints/, plans/, logs/, tmp/,
+#    settings.local.json, etc.) stays in place because we never delete
+#    .claude/ as a whole.
+TEMPLATE_DIRS_IN_CLAUDE=(agents hooks rules skills docs)
+TEMPLATE_FILES_IN_CLAUDE=(settings.json)
+
+yellow "Replacing template-managed paths under .claude/"
+for d in "${TEMPLATE_DIRS_IN_CLAUDE[@]}"; do
+  rm -rf ".claude/$d"
+  if [[ -d "$TMP_DIR/.claude/$d" ]]; then
+    cp -R "$TMP_DIR/.claude/$d" ".claude/$d"
+  fi
+done
+for f in "${TEMPLATE_FILES_IN_CLAUDE[@]}"; do
+  if [[ -f "$TMP_DIR/.claude/$f" ]]; then
+    cp "$TMP_DIR/.claude/$f" ".claude/$f"
+  fi
+done
+
+yellow "Replacing .codex/, .gemini/, CLAUDE.md"
+rm -rf .codex .gemini
 cp -R "$TMP_DIR/.codex" .codex
 cp -R "$TMP_DIR/.gemini" .gemini
 cp "$TMP_DIR/CLAUDE.md" CLAUDE.md

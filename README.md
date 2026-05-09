@@ -168,9 +168,14 @@ Or, if `scripts/update.sh` is already in your tree:
 ./scripts/update.sh
 ```
 
-Preserved: `CLAUDE.md` Zone B, `.claude/routing-keywords.json`, `.claude/backtest-thresholds.json`, `.claude/settings.local.json`.
+Preserved (never touched, restored, or untouched-by-design):
+- `CLAUDE.md` Zone B (between `@orchestra:template-boundary` and `@orchestra:repo-boundary`) — backed up and restored
+- `.claude/routing-keywords.json`, `.claude/backtest-thresholds.json` — backed up and restored
+- `.claude/projects/` (project memory / auto-memory), `.claude/checkpoints/` (`/checkpointing` state), `.claude/plans/` (Plan-mode output), `.claude/logs/`, `.claude/tmp/` — never deleted
+- `.claude/settings.local.json` (per-machine overrides) — never deleted
+- Anything else under `.claude/` not in the overwrite list below — never deleted
 
-Overwritten: `.claude/` agents / hooks / rules / skills / settings.json, `.codex/`, `.gemini/`, `CLAUDE.md` Zone A. Untouched: project code (`src/`, `mql5/`, `tests/`), `pyproject.toml`, `README.md`.
+Overwritten: `.claude/{agents,hooks,rules,skills,docs}/`, `.claude/settings.json`, `.codex/`, `.gemini/`, `CLAUDE.md` Zone A. Untouched: project code (`src/`, `mql5/`, `tests/`), `pyproject.toml`, `README.md`.
 
 ## Architecture
 
