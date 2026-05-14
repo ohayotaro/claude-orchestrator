@@ -1,5 +1,19 @@
 # Language Conventions
 
+## No Emojis (Project-Wide)
+
+Do not use emojis anywhere in this project — file contents (Markdown, code, comments), commit messages, log output, or chat replies. Use plain ASCII markers instead:
+
+| Instead of | Use |
+|---|---|
+| `[x]` / `[ ]` checkboxes | (keep — these are ASCII) |
+| `(ok)` / `(fail)` / `(warn)` | (preferred status markers) |
+| `->` | (arrow — not the Unicode arrow) |
+| `OK` / `NG` / `TODO` | (status / priority words) |
+| plain bullet (`-`) | (no leading status emoji) |
+
+When editing existing files, opportunistically strip any emojis encountered.
+
 ## Base Rules
 
 | Target | Language | Notes |

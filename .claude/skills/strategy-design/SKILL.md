@@ -80,22 +80,66 @@ Evaluate:
 5. Risk control completeness"
 ```
 
-### Step 5: Strategy Implementation
+### Step 5: Register Strategy
 
-**Assess scope**: If the strategy requires multiple independent modules (signal generator, risk module, data adapter), transition to `/team-implement` with the design from Step 3-4 as input.
+Before implementation, mint a formal `strategy_id` via `/strategy-register register`. This ensures all downstream artifacts (code, tests, configs, reports) are scoped to a registry-managed identity from the start.
+
+Invoke `/strategy-register register` with the values derived from Steps 1-4:
+- `venue` — exchange or broker from the user's target market
+- `market` — market segment (spot, swap, fx, cash, etc.)
+- `logic_slug` — kebab-case name for the strategy logic (e.g., `mean-revert`, `ma-cross`)
+- `symbol` — target instrument in exchange-native form
+- `timeframe` — bar interval for the strategy
+- `runtime` — `python` or `mql5`
+- `account_scope` — project-defined account label (ask user if not clear)
+- `risk_group` — project-defined risk bucket (ask user if not clear)
+- `family_id` — defaults to `logic_slug` unless this is a variant of an existing family
+- `logic_version` — `0.1.0` for a fresh design
+
+The registration creates a `draft` entry in `config/registry.toml` and scaffolds per-strategy directories. Record the resulting `strategy_id` and `logic_version` — all subsequent design artifacts MUST reference them.
+
+### Step 6: Strategy Implementation
+
+**Assess scope**: If the strategy requires multiple independent modules (signal generator, risk module, data adapter), transition to `/team-implement` with the design from Step 3-4 as input, passing the `strategy_id` from Step 5.
 
 For single-module strategies, create strategy file in `src/strategies/`:
 - Inherit from base strategy class
 - Implement signal generation
 - Implement entry/exit logic
 - Define all parameters with ranges for optimization
-- Include docstring with edge rationale
+- Include docstring with edge rationale and `strategy_id`
 
-### Step 6: Parameter Specification
+### Step 7: Parameter Specification
 Generate parameter document:
 - Parameter name, type, default, range
 - Sensitivity expectations
 - Correlation between parameters
 
-### Step 7: Test Skeleton
-Create corresponding test file in `tests/test_strategies/`
+### Step 8: Test Skeleton
+Create corresponding test file in `tests/test_strategies/`, scoped to the `strategy_id`.
+
+### Step 9: Design Specification Output
+Produce the final design specification document. The specification MUST include the following first-class fields at the top:
+
+```
+strategy_id:    {strategy_id from Step 5}
+logic_version:  {logic_version from Step 5}
+family_id:      {family_id}
+venue:          {venue}
+market:         {market}
+symbol:         {symbol}
+timeframe:      {timeframe}
+runtime:        {runtime}
+risk_group:     {risk_group}
+state:          draft
+```
+
+Followed by: edge hypothesis, signal logic, entry/exit rules, position sizing, risk parameters, parameter specification, and Codex review findings.
+
+Save the design specification to `reports/strategies/{strategy_id}/design_spec.md`.
+
+## Downstream Skill Contract
+
+Subsequent skills (`/backtest`, `/bot-develop`, `/ea-generate`, `/optimize`) MUST be invoked with the `strategy_id` produced by this skill. They will resolve all paths via `config/registry.toml` lookup. Do not pass ad-hoc identifiers or hardcoded paths.
+
+If a strategy was designed without registration (legacy workflow), run `/strategy-register register` before proceeding to any downstream skill.

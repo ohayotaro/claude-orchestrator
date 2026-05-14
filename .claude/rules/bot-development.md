@@ -1,5 +1,18 @@
 # Bot Development Rules
 
+## Multi-Strategy Bot Pattern
+
+Every bot MUST be strategy-aware from the start. The default model is one process = one strategy.
+
+- **CLI interface**: Accept `--strategy-id` as a required command-line argument. Example: `uv run python -m src.bot.main --strategy-id binance.swap.mean-revert.btcusdt.5m.v1`
+- **Config resolution**: Read the strategy's config from `config/strategies/{strategy_id}.toml`. The path is looked up in `config/registry.toml`, not hardcoded.
+- **State store**: Open the `StateStore` at `state/strategies/{strategy_id}/` (default SQLite backend at `state/strategies/{strategy_id}/state.db`).
+- **Logging**: Write structured JSONL to `logs/strategies/{strategy_id}/bot.jsonl`. Every log event includes `strategy_id`.
+- **Registry validation**: On startup, the bot MUST verify that `strategy_id` exists in `config/registry.toml`, that `enabled == true`, and that `state` permits the requested mode (e.g., `state = "live"` for live trading). Refuse to start otherwise.
+- **Environment**: The `STRATEGY_ID` environment variable is set per container/service (see `deployment.md`). The bot MAY read it as a fallback when `--strategy-id` is not provided on the CLI.
+
+See `multi-strategy.md` sections 5 and 7 for the full isolation and skill contract requirements.
+
 ## ccxt Standard Patterns
 
 ### Exchange Initialization
@@ -77,44 +90,44 @@ Every bot MUST emit structured JSON logs (via structlog or equivalent) for the f
 
 **Lifecycle:**
 ```json
-{"event": "bot_started",    "strategy": "...", "version": "...", "config_hash": "...", "ts": "ISO8601"}
-{"event": "bot_stopped",    "reason": "user|kill_switch|error|maintenance", "uptime_s": 3600, "ts": "..."}
-{"event": "bot_heartbeat",  "uptime_s": 3600, "open_positions": 2, "daily_pnl": -0.5, "ts": "..."}
+{"event": "bot_started",    "strategy_id": "...", "version": "...", "config_hash": "...", "ts": "ISO8601"}
+{"event": "bot_stopped",    "strategy_id": "...", "reason": "user|kill_switch|error|maintenance", "uptime_s": 3600, "ts": "..."}
+{"event": "bot_heartbeat",  "strategy_id": "...", "uptime_s": 3600, "open_positions": 2, "daily_pnl": -0.5, "ts": "..."}
 ```
 Heartbeat interval: every 60 seconds (configurable).
 
 **Orders:**
 ```json
-{"event": "order_created",  "order_id": "...", "symbol": "...", "side": "buy", "type": "limit", "size": 0.01, "price": 65000.0, "ts": "..."}
-{"event": "order_submitted","order_id": "...", "exchange_id": "...", "ts": "..."}
-{"event": "order_filled",   "order_id": "...", "fill_price": 65001.5, "fill_size": 0.01, "slippage_bps": 2.3, "ts": "..."}
-{"event": "order_cancelled","order_id": "...", "reason": "timeout|user|exchange", "ts": "..."}
-{"event": "order_rejected", "order_id": "...", "reason": "insufficient_balance", "ts": "..."}
+{"event": "order_created",  "strategy_id": "...", "order_id": "...", "symbol": "...", "side": "buy", "type": "limit", "size": 0.01, "price": 65000.0, "ts": "..."}
+{"event": "order_submitted","strategy_id": "...", "order_id": "...", "exchange_id": "...", "ts": "..."}
+{"event": "order_filled",   "strategy_id": "...", "order_id": "...", "fill_price": 65001.5, "fill_size": 0.01, "slippage_bps": 2.3, "ts": "..."}
+{"event": "order_cancelled","strategy_id": "...", "order_id": "...", "reason": "timeout|user|exchange", "ts": "..."}
+{"event": "order_rejected", "strategy_id": "...", "order_id": "...", "reason": "insufficient_balance", "ts": "..."}
 ```
 
 **Positions:**
 ```json
-{"event": "position_opened","symbol": "...", "side": "long", "size": 0.01, "entry_price": 65000.0, "ts": "..."}
-{"event": "position_closed","symbol": "...", "side": "long", "size": 0.01, "exit_price": 65500.0, "pnl": 5.0, "pnl_pct": 0.77, "holding_s": 1800, "ts": "..."}
-{"event": "position_update","symbol": "...", "unrealized_pnl": 3.2, "unrealized_pnl_pct": 0.49, "ts": "..."}
+{"event": "position_opened","strategy_id": "...", "symbol": "...", "side": "long", "size": 0.01, "entry_price": 65000.0, "ts": "..."}
+{"event": "position_closed","strategy_id": "...", "symbol": "...", "side": "long", "size": 0.01, "exit_price": 65500.0, "pnl": 5.0, "pnl_pct": 0.77, "holding_s": 1800, "ts": "..."}
+{"event": "position_update","strategy_id": "...", "symbol": "...", "unrealized_pnl": 3.2, "unrealized_pnl_pct": 0.49, "ts": "..."}
 ```
 Position update interval: every 30 seconds while a position is open (configurable).
 
 **Safety:**
 ```json
-{"event": "safety_triggered","gate": "daily_loss_limit", "details": "daily loss -5.1% exceeds -5.0% threshold", "action": "block_new_entries", "ts": "..."}
-{"event": "reconnect",      "target": "websocket", "attempt": 3, "backoff_s": 8, "ts": "..."}
-{"event": "reconciliation", "status": "mismatch", "local_size": 0.01, "exchange_size": 0.0, "ts": "..."}
+{"event": "safety_triggered","strategy_id": "...", "gate": "daily_loss_limit", "details": "daily loss -5.1% exceeds -5.0% threshold", "action": "block_new_entries", "ts": "..."}
+{"event": "reconnect",      "strategy_id": "...", "target": "websocket", "attempt": 3, "backoff_s": 8, "ts": "..."}
+{"event": "reconciliation", "strategy_id": "...", "status": "mismatch", "local_size": 0.01, "exchange_size": 0.0, "ts": "..."}
 ```
 
 **Performance (periodic, every 5 minutes):**
 ```json
-{"event": "perf_snapshot",  "api_latency_p50_ms": 45, "api_latency_p99_ms": 230, "api_errors_1h": 2, "ws_reconnects_1h": 0, "ts": "..."}
+{"event": "perf_snapshot",  "strategy_id": "...", "api_latency_p50_ms": 45, "api_latency_p99_ms": 230, "api_errors_1h": 2, "ws_reconnects_1h": 0, "ts": "..."}
 ```
 
 ### Log Output Rules
 - Format: JSON, one event per line (JSONL)
-- Output: stdout (for Docker/systemd capture) AND file (`logs/bot.jsonl`)
+- Output: stdout (for Docker/systemd capture) AND file (`logs/strategies/{strategy_id}/bot.jsonl`)
 - All events include `ts` (ISO 8601 UTC) and `event` (snake_case event name)
 - Sensitive data (API keys, secrets) MUST NEVER appear in logs
 - Log level mapping: lifecycle=INFO, orders=INFO, positions=INFO, safety=WARNING, errors=ERROR, heartbeat=DEBUG
@@ -157,13 +170,16 @@ class StateStore(Protocol):
     async def load_checkpoint(self) -> dict | None: ...
 ```
 
+The `StateStore` protocol above is the ONLY interface bots use to persist state. This abstraction exists specifically to allow later migration from per-strategy SQLite to a central PostgreSQL backend WITHOUT changing skill contracts. Bots MUST NOT bypass `StateStore` to touch SQLite directly. See `multi-strategy.md` section 5 for the state store abstraction requirements.
+
 ### Recommended Default (SQLite + WAL)
 
-SQLite with WAL mode is the recommended default. PostgreSQL, Redis, or other backends can be used depending on project requirements.
+SQLite with WAL mode is the recommended default. PostgreSQL, Redis, or other backends can be used depending on project requirements. One DB per strategy is the default layout.
 
 ```python
 # aiosqlite with WAL for concurrent read/write safety
-async with aiosqlite.connect("bot_state.db") as db:
+# Path resolved from registry: state/strategies/{strategy_id}/state.db
+async with aiosqlite.connect("state/strategies/{strategy_id}/state.db") as db:
     await db.execute("PRAGMA journal_mode=WAL")
     await db.execute("PRAGMA synchronous=NORMAL")
     await db.execute("PRAGMA busy_timeout=5000")

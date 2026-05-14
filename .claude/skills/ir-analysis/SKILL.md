@@ -101,10 +101,10 @@ Combine quantitative and qualitative findings into an investment thesis:
 ### Key Metrics
 | Metric | Current | 3Y Avg | Sector Median | Assessment |
 |--------|---------|--------|---------------|------------|
-| ROE | X% | X% | X% | ✅/⚠️/❌ |
-| FCF Yield | X% | X% | X% | ✅/⚠️/❌ |
-| Debt/Equity | X | X | X | ✅/⚠️/❌ |
-| EPS Growth | X% | X% | X% | ✅/⚠️/❌ |
+| ROE | X% | X% | X% | good/warn/bad |
+| FCF Yield | X% | X% | X% | good/warn/bad |
+| Debt/Equity | X | X | X | good/warn/bad |
+| EPS Growth | X% | X% | X% | good/warn/bad |
 
 ### Catalysts (Positive)
 - {Upcoming event that could drive upside}

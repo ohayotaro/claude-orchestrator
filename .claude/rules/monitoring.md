@@ -10,14 +10,16 @@ logger = structlog.get_logger()
 
 # Every log entry must include:
 logger.info("order_placed",
+    strategy_id="binance.swap.mean-revert.btcusdt.5m.v1",
     symbol="BTC/USDT",
     side="buy",
     amount=0.001,
     price=65000.0,
     order_id="abc123",
-    strategy="ma_crossover",
 )
 ```
+
+Every log event MUST include `strategy_id`. The risk aggregator and monitoring layer partition on this field. Omitting it makes the event invisible to per-strategy dashboards and cross-strategy aggregation.
 
 ### Log Levels
 | Level | Usage |
@@ -36,9 +38,13 @@ logger.info("order_placed",
 - PnL snapshot (every 5 minutes)
 - Health check results
 
+Every event above MUST include at minimum: `event`, `ts` (ISO 8601 UTC), and `strategy_id`.
+
 ## Metrics
 
 ### Core Metrics to Track
+All metrics below MUST carry a `strategy_id` label so per-strategy panels and cross-strategy aggregation can partition correctly. Where a metric is account-level (e.g. margin), it carries an `account_scope` label instead.
+
 | Metric | Type | Description |
 |--------|------|-------------|
 | `bot_uptime_seconds` | Gauge | Time since last restart |
@@ -80,13 +86,22 @@ Support at least one of:
 ```json
 {
     "severity": "CRITICAL",
-    "bot": "ma_crossover_btcusdt",
+    "strategy_id": "binance.swap.mean-revert.btcusdt.5m.v1",
+    "risk_group": "crypto-main",
     "event": "daily_loss_limit",
     "message": "Daily loss exceeded 5% threshold (-5.23%)",
     "timestamp": "2026-04-21T15:30:00Z",
     "action_taken": "Emergency stop triggered"
 }
 ```
+
+## Per-Strategy Log Isolation
+
+Each strategy writes to its own JSONL file at `logs/strategies/{strategy_id}/bot.jsonl`. This is the default layout defined in `multi-strategy.md` section 5.
+
+- Log rotation is per-file (not per-account). Each strategy's `bot.jsonl` rotates independently at the thresholds defined in "Log Rotation" below.
+- Even though logs are stored in separate files, every event MUST still include `strategy_id` in the JSON body. This allows safe concatenation and re-partitioning when logs are shipped to a central store.
+- The risk aggregator and `/bot-monitor` discover log paths by reading `log_path` from `config/registry.toml` for each strategy.
 
 ## Log Rotation
 

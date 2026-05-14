@@ -26,6 +26,9 @@
 #   - .claude/plans/           — Plan-mode output and user notes
 #   - .claude/logs/            — agent team logs
 #   - .claude/tmp/             — transient review artifacts
+#   - .claude/docs/DESIGN.md   — project-specific ADRs
+#   - .claude/docs/incidents/  — incident postmortems (permanent record)
+#   - .claude/docs/reviews/    — past review artifacts
 #   - .claude/settings.local.json — per-machine overrides
 #   - any other file/dir under .claude/ not listed in TEMPLATE_PATHS below
 #   - CLAUDE.md Zone B (backed up and restored)
@@ -35,7 +38,7 @@
 # What is overwritten:
 #   - CLAUDE.md Zone A (template orchestration policy)
 #   - .claude/agents/, .claude/hooks/, .claude/rules/, .claude/skills/
-#   - .claude/docs/ (CODEX_HANDOFF_PLAYBOOK.md and similar template docs)
+#   - .claude/docs/CODEX_HANDOFF_PLAYBOOK.md (file-level, not the docs/ dir)
 #   - .claude/settings.json (re-add custom permissions afterward if needed;
 #     prefer .claude/settings.local.json for per-machine overrides)
 #   - .codex/, .gemini/
@@ -98,8 +101,17 @@ git clone --depth 1 "$REPO_URL" "$TMP_DIR"
 #    User/project state (projects/, checkpoints/, plans/, logs/, tmp/,
 #    settings.local.json, etc.) stays in place because we never delete
 #    .claude/ as a whole.
-TEMPLATE_DIRS_IN_CLAUDE=(agents hooks rules skills docs)
-TEMPLATE_FILES_IN_CLAUDE=(settings.json)
+# Template-managed directories: fully replaced.
+# IMPORTANT: do NOT include `docs/` here. `.claude/docs/` mixes template files
+# (CODEX_HANDOFF_PLAYBOOK.md) with project-specific permanent records (DESIGN.md,
+# incidents/, reviews/). Use file-level replacement for docs instead.
+TEMPLATE_DIRS_IN_CLAUDE=(agents hooks rules skills)
+
+# Template-managed files: replaced individually. Paths are relative to .claude/.
+TEMPLATE_FILES_IN_CLAUDE=(
+  settings.json
+  docs/CODEX_HANDOFF_PLAYBOOK.md
+)
 
 yellow "Replacing template-managed paths under .claude/"
 for d in "${TEMPLATE_DIRS_IN_CLAUDE[@]}"; do
@@ -110,6 +122,7 @@ for d in "${TEMPLATE_DIRS_IN_CLAUDE[@]}"; do
 done
 for f in "${TEMPLATE_FILES_IN_CLAUDE[@]}"; do
   if [[ -f "$TMP_DIR/.claude/$f" ]]; then
+    mkdir -p "$(dirname ".claude/$f")"
     cp "$TMP_DIR/.claude/$f" ".claude/$f"
   fi
 done

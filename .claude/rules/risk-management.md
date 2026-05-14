@@ -24,6 +24,9 @@ All EAs and Bots MUST implement the following risk controls:
 5. Sudden account balance drop → Full stop + notification
 ```
 
+### Per-Strategy Config Ownership
+Per-strategy risk limits (max position size, daily loss, drawdown, stop loss) MUST live in the per-strategy TOML at `config/strategies/{strategy_id}.toml`, NOT in shared config files. This ensures adding or changing one strategy never affects another. See `multi-strategy.md` section 5 for the per-strategy config schema.
+
 ### Stop Loss
 - **Mandatory**: Every position MUST have a stop loss
 - Strategies without stop loss are NOT permitted
@@ -79,6 +82,44 @@ Pre-trade check sequence:
 7. Position size limit?       → BLOCK if exceeded
 8. All clear                  → ALLOW trade
 ```
+
+## Cross-Strategy Risk Aggregation
+
+When multiple strategies run in parallel, per-strategy risk controls are necessary but not sufficient. A separate aggregator service enforces account- and group-level limits across all strategies. See `multi-strategy.md` section 6 for the full specification.
+
+### Aggregator Service
+- A dedicated process (`src/risk/aggregator.py`) monitors all strategies within a given `account_scope` and `risk_group`.
+- `risk_group` is a project-defined label assigned per strategy in `config/registry.toml`. Common patterns: one bucket per account, one per strategy family, or a shared bucket for cross-venue hedged books.
+- `account_scope` identifies the exchange/broker account. Multiple `account_scope` values may share a `risk_group` for cross-venue aggregation.
+- The aggregator config (`config/risk_groups.toml`) maps groups to strategies and thresholds.
+
+### Aggregated Metrics (Minimum)
+The aggregator MUST track at least:
+- Net exposure (per-symbol, per-asset, group total)
+- Gross exposure (sum of absolute notional)
+- Daily realized + unrealized PnL (per strategy, group total)
+- Drawdown vs. start-of-day and high-water mark (group total)
+- Open position count, open order count
+- Margin usage / leverage (per `account_scope`)
+
+### Enforcement: Soft Cap vs Hard Cap
+| Breach | Action |
+|---|---|
+| Soft cap (e.g. group daily loss > 3%) | All strategies in `risk_group` block new entries |
+| Hard cap (e.g. group daily loss > 5%) | All strategies in `risk_group` block new entries AND flatten existing positions |
+| Margin / emergency (e.g. margin ratio > 95%) | Flatten-and-halt for all strategies in `account_scope` |
+| Per-strategy breach (existing rules) | Only that strategy stops; aggregator unaffected |
+
+Thresholds are project-configurable; defaults match the Warning Thresholds table above.
+
+### Reconciliation Source
+The aggregator MUST reconcile against exchange/broker state, NOT self-reported bot state. The aggregator queries the venue at least every 60 seconds. Self-reported metrics from bot logs are used for real-time approximation but never as the authoritative source for enforcement decisions.
+
+Note the two reconciliation intervals defined in this document:
+- **Per-bot reconciliation (every 30 seconds, see Position Reconciliation above)**: a single bot compares its local state against the venue for crash-recovery and divergence detection. Scope is one strategy.
+- **Aggregator reconciliation (every 60 seconds)**: the cross-strategy aggregator queries the venue to refresh authoritative balances/positions for `risk_group`-level enforcement. Scope is all strategies in a `risk_group` / `account_scope`.
+
+On aggregator reconciliation failure, fail-closed behavior is specified in `multi-strategy.md` section 6 ("Reconciliation failure behavior").
 
 ## Equity-Specific Risk Rules
 

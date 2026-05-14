@@ -156,17 +156,22 @@ src/data/          → Data fetching and management
 src/strategies/    → Trading strategies
 src/backtesting/   → Backtest engine
 src/optimization/  → Parameter optimization
-src/risk/          → Risk management
+src/risk/          → Risk management (includes aggregator.py for cross-strategy)
 src/bot/           → API-based bot engine (executor, position tracker, WebSocket)
+src/orchestrator/  → Registry interface (registry.py); written only by /strategy-register
 src/monitoring/    → Monitoring and alerting
 src/utils/         → Utilities
-mql5/experts/      → Expert Advisors
+mql5/experts/      → Expert Advisors (one per strategy, named {strategy_id_safe}.mq5)
 mql5/include/      → MQL5 shared libraries
 mql5/indicators/   → Custom indicators
-docker/            → Dockerfile, docker-compose examples
+mql5/presets/      → Per-strategy .set presets (MagicNumber from registry)
+config/            → registry.toml + risk_groups.toml + strategies/{strategy_id}.toml
+docker/            → Dockerfile, per-strategy compose under docker/{strategy_id_safe}/
 tests/             → Test suite
 data/              → Data storage (gitignored)
-reports/           → Backtest report output
+state/strategies/  → Per-strategy SQLite + checkpoints (gitignored contents)
+logs/strategies/   → Per-strategy JSONL logs (gitignored contents)
+reports/           → Reports (per-strategy under reports/strategies/{strategy_id}/)
 ```
 
 ---
@@ -175,4 +180,26 @@ reports/           → Backtest report output
 
 ## Current Context
 
-<!-- Active work context is appended here -->
+### 2026-05-14 — Multi-Strategy Foundation Landed
+
+The orchestrator's skill / rule skeleton now supports multiple strategies in parallel as a first-class concern. Switching strategies no longer requires rewriting shared files.
+
+- New rule: `.claude/rules/multi-strategy.md` (contract for `strategy_id`, MagicNumber, registry, isolation, risk aggregation)
+- New skill: `/strategy-register` (only sanctioned writer of `config/registry.toml`)
+- New rule addition: `.claude/rules/language.md` "No Emojis (Project-Wide)" — applies to all files and chat
+- Rules updated: `coding-principles`, `risk-management`, `monitoring`, `bot-development`, `deployment`
+- Skills updated: `init-finance`, `strategy-design`, `bot-develop`, `ea-generate`, `bot-deploy`, `bot-monitor`, `risk-report`
+- Design record: DESIGN.md ADR-005
+
+Defaults established:
+- Identity: `<venue>.<market>.<logic_slug>.<symbol>.<timeframe>.v<major>` (e.g. `binance.swap.mean-revert.btcusdt.5m.v1`)
+- Runtime: 1 strategy = 1 process / container, per-strategy SQLite, per-strategy JSONL log
+- MagicNumber range: `20_000_000`-`89_999_999`, deterministic hash with salt-resolved collisions, frozen in registry
+- Lifecycle: `draft -> testnet -> live -> deprecated -> retired` (no backward transitions); `/bot-deploy` is the only authorized live promoter
+- Risk aggregator: separate service per `risk_group`, reconciles against venue every 60s
+
+Outstanding follow-ups (not blocking, but should be picked up):
+- Reference implementation of `src/orchestrator/registry.py` and `src/risk/aggregator.py` (currently scaffold stubs from `/init-finance`)
+- CI wiring of `/strategy-register audit`
+- The `check-codex-before-write.py` hook treats the auto-memory directory (`~/.claude/projects/-Users-ohayotaro-claude-finance/memory/`) as path traversal because it sits outside `CLAUDE_PROJECT_DIR`. This blocks legitimate memory writes — needs an explicit allowlist for the memory dir.
+- `/team-review` of this batch (deferred — touched 12 files, ~700+ lines)

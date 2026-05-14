@@ -52,12 +52,32 @@ def main() -> None:
     if not file_path:
         sys.exit(0)
 
-    # Security: prevent path traversal
+    # Security: prevent path traversal, with an explicit allowlist for the
+    # auto-memory directory (lives outside CLAUDE_PROJECT_DIR by design).
+    # Compare with os.path.commonpath so that a sibling like
+    # /Users/foo/claude-finance-evil cannot bypass a project root of
+    # /Users/foo/claude-finance via a prefix match.
+    def _is_within(child: str, parent: str) -> bool:
+        try:
+            return os.path.commonpath([child, parent]) == parent
+        except ValueError:
+            return False
+
     real_path = os.path.realpath(file_path)
     project_dir = os.environ.get("CLAUDE_PROJECT_DIR", "")
-    if project_dir and not real_path.startswith(os.path.realpath(project_dir)):
-        print("Path traversal detected", file=sys.stderr)
-        sys.exit(2)
+    if project_dir:
+        real_project = os.path.realpath(project_dir)
+        if not _is_within(real_path, real_project):
+            home = os.path.expanduser("~")
+            project_encoded = real_project.replace("/", "-")
+            memory_dir = os.path.realpath(
+                os.path.join(home, ".claude", "projects", project_encoded, "memory")
+            )
+            if _is_within(real_path, memory_dir):
+                # Memory writes bypass the design check entirely.
+                sys.exit(0)
+            print("Path traversal detected", file=sys.stderr)
+            sys.exit(2)
 
     reasons: list[str] = []
 

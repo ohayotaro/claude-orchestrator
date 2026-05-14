@@ -21,6 +21,9 @@
 
 ### Mandatory
 ```bash
+# Strategy identity (required per bot service)
+STRATEGY_ID=<strategy_id>
+
 # Exchange credentials
 EXCHANGE_API_KEY=
 EXCHANGE_SECRET_KEY=
@@ -52,6 +55,7 @@ LOG_LEVEL=INFO
 # HTTP endpoint: GET /health → 200 OK
 {
     "status": "healthy",
+    "strategy_id": "binance.swap.mean-revert.btcusdt.5m.v1",
     "uptime_seconds": 3600,
     "exchange_connected": true,
     "last_heartbeat": "2026-04-21T12:00:00Z",
@@ -66,18 +70,21 @@ LOG_LEVEL=INFO
 
 ## systemd Service (VPS)
 
+Service naming convention: `bot-{strategy_id_safe}` where `strategy_id_safe` replaces dots with dashes (e.g., `bot-binance-swap-mean-revert-btcusdt-5m-v1`).
+
 ```ini
 [Unit]
-Description=Trading Bot - {strategy_name}
+Description=Trading Bot - {strategy_id}
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
 User=botuser
-EnvironmentFile=/etc/bot/.env
-ExecStart=/usr/bin/docker compose -f /opt/bot/docker-compose.yml up
-ExecStop=/usr/bin/docker compose -f /opt/bot/docker-compose.yml down
+Environment="STRATEGY_ID={strategy_id}"
+EnvironmentFile=/etc/bot/{strategy_id_safe}.env
+ExecStart=/usr/bin/docker compose -f /opt/bot/{strategy_id_safe}/docker-compose.yml up
+ExecStop=/usr/bin/docker compose -f /opt/bot/{strategy_id_safe}/docker-compose.yml down
 Restart=on-failure
 RestartSec=30
 StartLimitInterval=300
@@ -86,6 +93,26 @@ StartLimitBurst=5
 [Install]
 WantedBy=multi-user.target
 ```
+
+## Multi-Strategy Deployment
+
+The default deployment model is: 1 strategy = 1 container = 1 systemd unit (or 1 launchd plist). This maps directly to the process isolation model in `multi-strategy.md` sections 5 and 6.
+
+### Naming Convention
+- Container and service names follow the pattern `bot-{strategy_id_safe}` where `strategy_id_safe` replaces all dots in `strategy_id` with dashes.
+- Example: strategy `binance.swap.mean-revert.btcusdt.5m.v1` becomes service `bot-binance-swap-mean-revert-btcusdt-5m-v1`.
+
+### Strategy Resolution
+Each container reads its `strategy_id` from the `STRATEGY_ID` environment variable. The bot process uses this to:
+1. Look up its entry in `config/registry.toml`.
+2. Resolve all paths (config, state, logs) from the registry entry.
+3. Verify `enabled == true` and `state` permits the requested mode before starting.
+
+### Risk Aggregator
+The risk aggregator (`src/risk/aggregator.py`) is deployed as a separate container/service, scoped per `risk_group`. It reads the registry to discover which strategies belong to its group and monitors their state and logs. See the "Cross-Strategy Risk Aggregation" section in `risk-management.md`.
+
+### Shared-Process Exception
+Running multiple strategies in a single process is an explicit opt-in for non-live or tightly-coupled bundles. It MUST be documented in `CLAUDE.md` Zone C with justification. The orchestrator MUST NOT default to it.
 
 ## CI/CD Pipeline
 
@@ -111,18 +138,22 @@ WantedBy=multi-user.target
 For local/dev deployment on macOS (alternative to Docker):
 
 ### plist Template
+One plist per strategy. Use `strategy_id_safe_svc` (dots replaced by dashes) in the Label for consistency with the Docker/systemd naming. Per-strategy logs go under `logs/strategies/{strategy_id}/`.
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "...">
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.trading.{bot_name}</string>
+    <string>com.trading.{strategy_id_safe_svc}</string>
     <key>ProgramArguments</key>
     <array>
         <string>/path/to/.venv/bin/python</string>
         <string>-m</string>
         <string>src.bot.main</string>
+        <string>--strategy-id</string>
+        <string>{strategy_id}</string>
     </array>
     <key>WorkingDirectory</key>
     <string>/path/to/project</string>
@@ -131,13 +162,15 @@ For local/dev deployment on macOS (alternative to Docker):
     <key>ThrottleInterval</key>
     <integer>30</integer>
     <key>StandardOutPath</key>
-    <string>/path/to/logs/stdout.log</string>
+    <string>/path/to/project/logs/strategies/{strategy_id}/stdout.log</string>
     <key>StandardErrorPath</key>
-    <string>/path/to/logs/stderr.log</string>
+    <string>/path/to/project/logs/strategies/{strategy_id}/stderr.log</string>
     <key>EnvironmentVariables</key>
     <dict>
+        <key>STRATEGY_ID</key>
+        <string>{strategy_id}</string>
         <key>DOTENV_PATH</key>
-        <string>/path/to/.env</string>
+        <string>/path/to/project/config/strategies/{strategy_id}.env</string>
     </dict>
 </dict>
 </plist>
@@ -146,16 +179,16 @@ For local/dev deployment on macOS (alternative to Docker):
 ### Service Management
 ```bash
 # Load and start
-launchctl load ~/Library/LaunchAgents/com.trading.{bot_name}.plist
+launchctl load ~/Library/LaunchAgents/com.trading.{strategy_id_safe_svc}.plist
 
 # Stop and unload
-launchctl unload ~/Library/LaunchAgents/com.trading.{bot_name}.plist
+launchctl unload ~/Library/LaunchAgents/com.trading.{strategy_id_safe_svc}.plist
 
 # Check status
 launchctl list | grep trading
 
 # View logs
-tail -f /path/to/logs/stdout.log
+tail -f /path/to/project/logs/strategies/{strategy_id}/stdout.log
 ```
 
 ### Notes
